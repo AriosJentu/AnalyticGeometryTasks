@@ -136,13 +136,13 @@ class LinearExpression(Coefficient):
 						appended.append(expr_element)
 						break
 
-			elif value == element:
+			elif value == element or isinstance(value, (int, float)):
 				elements[index] = element + value
 				break
 
 		else:
 			if (
-						isinstance(value, (Coefficient, float)) 
+						isinstance(value, (Coefficient, int, float)) 
 					and not isinstance(value, (Variable, LinearExpression))
 			):
 				elements.append(Coefficient(value))
@@ -169,9 +169,13 @@ class LinearExpression(Coefficient):
 		random.shuffle(self._elements)
 
 	def to_str(self, with_sign: bool = False):
+		elements = [element for element in self._elements if element.to_str() != ""]
+		if len(elements) == 0:
+			return "0"
+
 		return "".join([
 			element.to_str(i > 0) 
-			for i, element in enumerate(self._elements)
+			for i, element in enumerate(elements)
 		])
 
 	def __iter__(self):
@@ -212,12 +216,13 @@ def main(*args):
 	linexp3 = (linexp+linexp2)
 	linexp3.shuffle()
 
+	linexp4 = LinearExpression()
+	linexp4 = linexp4 + 0
+
 	print(linexp)
 	print(linexp2)
 	print(linexp3)
-	for i in linexp:
-		print(i, type(i))
-
+	print(linexp4)
 
 if __name__ == "__main__":
 	main()
