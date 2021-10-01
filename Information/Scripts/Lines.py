@@ -1,5 +1,10 @@
 import random
 
+if __package__ == "" or __package__ is None:
+	import Expression
+else: 
+	from . import Expression
+
 def generate_point_name(*excepts: list[str]) -> str:
 	if not excepts:
 		excepts = []
@@ -12,10 +17,19 @@ def generate_point_name(*excepts: list[str]) -> str:
 
 	return chr(random.choice(numbers))
 
-def generate_variables(size: int = 2) -> list[str]:
+def generate_variables(size: int = 2) -> list[Expression.Variable]:
 	basic = ["x", "y", "z", "w", "t"]
 	other = [chr(ord("a")+i) for i in range(size-5)]
-	return (basic + other)[:size]
+	return [
+		Expression.Variable(var)
+		for var in (basic + other)[:size]
+	]
+
+def generate_parameter(dimension: int = 2) -> Expression.Variable:
+	if dimension <= 4:
+		return Expression.Variable("t")
+	else:
+		return Expression.Variable("v")
 
 class Point:
 
@@ -94,61 +108,7 @@ class Point:
 		return self.multiply(value)
 
 	def __rmul__(self, value: float) -> 'Point':
-		return self.multiply(value)
-
-class Linear:
-
-	def __init__(self, variable: str, diff: int, multiplier: int = 1):
-		self._variable = variable
-		
-		self._diff = abs(diff)
-		self._diff_sign = ["-", "+"][abs(diff) == diff]
-		
-		self._multiplier = abs(multiplier)
-		self._multiplier_sign = ["-", "+"][abs(multiplier) == multiplier]
-
-	def to_str(self):
-
-		if self._diff == 0 and self._multiplier == 0:
-			return "0"
-
-		real = f"{self._diff}"
-		variable = f"{self._multiplier}{self._variable}"
-
-		if self._multiplier == 1:
-			variable = f"{self._variable}"
-
-		signreal = self._diff_sign
-		signvariable = self._multiplier_sign
-
-		if self._diff == 0:
-			real = ""
-			signreal = ""
-
-		if self._multiplier == 0:
-			variable = ""
-			signvariable = ""
-
-		if signvariable == "-" and signreal == "+":
-			if signreal == "+":
-				signreal = ""
-
-			if real == "" and signvariable == "+":
-				signvariable = ""
-			
-			return f"{signreal}{real}{signvariable}{variable}"
-
-		else:
-			if signvariable == "+":
-				signvariable = ""
-
-			if variable == "" and signreal == "+":
-				signreal = ""
-
-			return f"{signvariable}{variable}{signreal}{real}"
-
-	def __str__(self):
-		return self.to_str()
+		return self.multiply(value) 
 
 
 class Line:
@@ -186,7 +146,8 @@ class Line:
 		point1 = self._point1*(-1)
 		
 		for i in range(self.dimension):
-			numer = Linear(variables[i], point1.point[i])
+			numer = Expression.LinearExpression(variables[i], point1.point[i])
+			numer.shuffle()
 			denom = pdiff.point[i]
 			parts.append(f"\\frac{{{numer.to_str()}}}{{{denom}}}")
 
@@ -196,12 +157,17 @@ class Line:
 
 		parts = []
 		variables = generate_variables(self.dimension)
-		parameter = ["t", "u"][self.dimension > 4]
+		parameter = generate_parameter(self.dimension)
 
 		pdiff = self._point2 - self._point1
 
 		for i in range(self.dimension):
-			right = Linear(parameter, self._point1.point[i], pdiff.point[i])
+			right = Expression.LinearExpression(
+				parameter*pdiff.point[i], 
+				self._point1.point[i]
+			)
+			right.shuffle()
+
 			parts.append(f"{variables[i]} &= {right.to_str()}")
 
 		result = " \\\\\n\t\t\t".join(parts)
@@ -219,6 +185,11 @@ class Line:
 
 	def __str__(self):
 		return self.to_random_form()
+
+class Plane:
+
+	def __init__(self, dimension: int = 3):
+		pass
 
 def main(*args):
 
