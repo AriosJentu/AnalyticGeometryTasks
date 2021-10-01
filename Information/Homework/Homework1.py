@@ -32,7 +32,7 @@ def tasks_updater(text):
 	return text
 
 tasks = []
-for i in range(4):
+for i in range(5):
 	tasks_i = Imports.Tasks.SpecificTasks()
 	task_i = Imports.Tasks.SpecificTaskInfo(prefix+f"Task{i+1}.tex")
 	task_i.set_updater_function(tasks_updater)
