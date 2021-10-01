@@ -1,0 +1,22 @@
+\documentclass[a4paper, fleqn, 12pt]{article}
+\usepackage{../#MODULE#/Styles/style}
+
+\newcommand{\student}{Student}
+\newcommand{\class}{Class}
+
+\pagestyle{empty}
+\parindent=0pt
+
+\newcommand{\drawpage}[4]{
+	\drawtitle{#1}{#2}{#3}{../#MODULE#/Styles/fefulogo.pdf}{0.2}
+	
+	\begin{enumerate}
+		#4
+	\end{enumerate}
+
+	\pagebreak
+}
+
+\begin{document}
+#CONTENT#
+\end{document}

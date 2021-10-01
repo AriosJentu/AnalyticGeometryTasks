@@ -1,0 +1,67 @@
+\RequirePackage[T1,T2A]{fontenc}		%font quality
+\RequirePackage[russian]{babel}			%language package
+\RequirePackage[utf8]{inputenc}			%for access utf encoding chars
+\RequirePackage{graphicx}				%for \includegraphics
+\RequirePackage{amsmath} 				%for math
+\RequirePackage{amssymb} 				%for special math chars (>=, etc)
+\RequirePackage{cases}					%for system of equations
+\RequirePackage{draftwatermark}			%for background watermark
+
+\textwidth 16cm
+\textheight 25cm
+\oddsidemargin -3mm
+\evensidemargin -3mm
+\topmargin -10mm
+\pdfpageheight 297mm
+
+\SetWatermarkText{} %Disable watermark by default
+
+\pagestyle{empty}
+\setlength{\itemsep}{2pt}\setlength{\parskip}{0pt}
+\parindent 0pt
+
+\newcommand{\bgwatermark}[1]{
+	\SetWatermarkText{\textsf{\textbf{#1}}}
+	\SetWatermarkScale{1.3}
+	\SetWatermarkAngle{58}
+}
+
+\newcommand{\updatestudent}[2]{
+	\renewcommand{\student}{#1}
+	\renewcommand{\class}{#2}
+
+	\bgwatermark{\student}
+}
+
+\newcommand{\drawtitle}[5]{
+	%1 - Title of the work
+	%2 - Class name
+	%3 - Student name
+	%4 - Location of the logo
+	%5 - Logo scale
+	\updatestudent{#3}{#2}
+	\vspace*{-2cm}
+	\begin{center}
+		\parbox{1cm}{\includegraphics[scale=#5]{#4}} %FEFU logo
+
+		\vspace{5pt}
+		
+		{\fontsize{10}{10} \selectfont МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ}
+		
+		{\large \textbf{<<Дальневосточный федеральный университет>>}} %FEFU title
+		
+		\vspace{4pt}
+		
+		#1	%Title of ticket
+		
+		\vspace{7pt} %Skip for class and student
+		{
+			\Large Группа #2	%Class
+			
+			\vspace{3pt}
+			
+			\bfseries #3	%Student
+		}
+
+	\end{center}
+}
