@@ -201,6 +201,8 @@ class LinearExpression(Coefficient):
 			for element in self._elements 
 			if element.coeff != 0
 		]
+		if len(coeffs) == 0:
+			return 1
 
 		minimal = min(coeffs)
 
@@ -217,7 +219,16 @@ class LinearExpression(Coefficient):
 			return Coefficient(0)
 
 	def as_positive(self):
-		if not self._elements[0].is_positive():
+
+		coeffs = [
+			element
+			for element in self._elements 
+			if element.coeff != 0
+		]
+		if len(coeffs) == 0:
+			return
+
+		if not coeffs[0].is_positive():
 			self._elements = [i*(-1) for i in self._elements]
 
 	def round(self, signs: int = 0):
