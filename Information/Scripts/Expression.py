@@ -11,9 +11,13 @@ class Coefficient:
 			self._coefficient = abs(value)
 			self._sign = ["-", "+"][abs(value) == value]
 
+	@property
+	def coeff(self):
+		return self._coefficient
+	
 	def __get_sign_drawing__(self, with_sign: bool = False):
 		sign = self._sign
-		if not with_sign and self._sign == "+":
+		if not with_sign and self.is_positive():
 			sign = ""
 
 		return sign
@@ -21,13 +25,13 @@ class Coefficient:
 	def to_str(self, with_sign: bool = False) -> str:
 		sign = self.__get_sign_drawing__(with_sign)
 		
-		if self._coefficient == 0:
+		if self.coeff == 0:
 			return ""
 
-		return f"{sign}{self._coefficient}"
+		return f"{sign}{self.coeff}"
 
 	def to_float(self) -> float:
-		return [-1, 1][self._sign == "+"]*self._coefficient
+		return [-1, 1][self.is_positive()]*self.coeff
 
 	def multiply(self, value: (float, 'Coefficient')) -> 'Coefficient':
 		
@@ -45,6 +49,12 @@ class Coefficient:
 			coeff += value
 
 		return Coefficient(coeff)
+
+	def int(self):
+		self._coefficient = int(self.coeff)
+
+	def is_positive(self):
+		return self._sign == "+"
 
 	def __add__(self, value: (float, 'Coefficient')) -> 'Coefficient':
 		return self.add(value)
@@ -76,6 +86,8 @@ class Coefficient:
 	def __ne__(self, coeff: 'Coefficient') -> bool:
 		return not self.__eq__(coeff)
 
+	def __round__(self, signs: int = 0) -> 'Coefficient':
+		return Coefficient(round(self.coeff, signs))
 
 class Variable(Coefficient):
 
@@ -83,29 +95,39 @@ class Variable(Coefficient):
 		super().__init__(coefficient)
 		self._variable = variable
 
+	@property
+	def var(self):
+		return self._variable
+
 	def to_float(self, at_point: float = 1):
 		return super().to_float()*at_point
 
 	def to_str(self, with_sign: bool = False) -> str:
-		if self._coefficient == 0:
+		if self.coeff == 0:
 			return ""
 
-		if self._coefficient != 1:
-			return f"{super().to_str(with_sign)}{self._variable}"
+		if self.coeff != 1:
+			return f"{super().to_str(with_sign)}{self.var}"
 		else:
-			return f"{self.__get_sign_drawing__(with_sign)}{self._variable}"
+			return f"{self.__get_sign_drawing__(with_sign)}{self.var}"
 
 	def multiply(self, value: (float, 'Coefficient')) -> 'Variable':
 		coeff = super().multiply(value)
-		return Variable(self._variable, coeff)
+		return Variable(self.var, coeff)
 
 	def add(self, value: (float, 'Variable')) -> 'Variable':
 		coeff = super().add(value)
 		if self == value:
-			return Variable(self._variable, coeff)
+			return Variable(self.var, coeff)
 
 	def __eq__(self, variable: 'Variable') -> bool:
-		return isinstance(variable, Variable) and self._variable == variable._variable
+		return (
+					isinstance(variable, Variable) 
+				and self.var == variable.var
+		)
+
+	def __round__(self, signs: int = 0) -> 'Variable':
+		return Variable(self.var, round(self.coeff, signs))
 
 class LinearExpression(Coefficient):
 
@@ -136,7 +158,11 @@ class LinearExpression(Coefficient):
 						appended.append(expr_element)
 						break
 
-			elif value == element or isinstance(value, (int, float)):
+			elif value == element or (
+						isinstance(value, (int, float)) 
+					and isinstance(element, Coefficient)
+					and not isinstance(element, Variable)
+			):
 				elements[index] = element + value
 				break
 
@@ -168,6 +194,40 @@ class LinearExpression(Coefficient):
 	def shuffle(self):
 		random.shuffle(self._elements)
 
+	def get_common_multiplicator(self):
+
+		coeffs = [
+			abs(element.coeff) 
+			for element in self._elements 
+			if element.coeff != 0
+		]
+
+		minimal = min(coeffs)
+
+		for divisor in range(minimal, 0, -1):
+			isdivisible = [value//divisor == value/divisor for value in coeffs]
+			if False not in isdivisible:
+				return divisor
+
+	def get_free_coefficient(self) -> Coefficient:
+		for element in self._elements:
+			if isinstance(element, Coefficient) and not isinstance(element, Variable):
+				return element
+		else:
+			return Coefficient(0)
+
+	def as_positive(self):
+		if not self._elements[0].is_positive():
+			self._elements = [i*(-1) for i in self._elements]
+
+	def round(self, signs: int = 0):
+		self._elements = [round(i, signs) for i in self._elements]
+
+	def int(self):
+		for element in self._elements:
+			if element.coeff == int(element.coeff):
+				element._coefficient = int(element.coeff)
+
 	def to_str(self, with_sign: bool = False):
 		elements = [element for element in self._elements if element.to_str() != ""]
 		if len(elements) == 0:
@@ -181,6 +241,10 @@ class LinearExpression(Coefficient):
 	def __iter__(self):
 		for element in self._elements:
 			yield element
+
+	def __round__(self, signs: int = 0):
+		self.round(signs)
+		return self
 
 def main(*args):
 	coef1 = Coefficient(1)
