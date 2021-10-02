@@ -2,8 +2,10 @@ import random
 
 if __package__ == "" or __package__ is None:
 	import Expression
+	import Matrix
 else: 
 	from . import Expression
+	from . import Matrix
 
 def generate_point_name(*excepts: list[str]) -> str:
 	if not excepts:
@@ -114,10 +116,13 @@ class Point:
 class Line:
 
 	def __init__(self, dimension: int = 2, maxvalue: int = 10):
+		if dimension < 2:
+			return 
+
 		self._dimension = dimension
 		self._maxvalue = maxvalue
-		self._point1 = Point(*[0 for i in range(dimension)])
-		self._point2 = Point(*[0 for i in range(dimension)])
+		self._point1 = Point(*[0 for _ in range(dimension)])
+		self._point2 = Point(*[0 for _ in range(dimension)])
 
 	def generate_random_line_points(self):
 		self._point1 = Point.generate_random_point(self._dimension, self._maxvalue)
@@ -186,28 +191,112 @@ class Line:
 	def __str__(self):
 		return self.to_random_form()
 
-class Plane:
+class HyperPlane:
 
-	def __init__(self, dimension: int = 3):
-		pass
+	def __init__(self, dimension: int = 3, maxvalue: int = 4):
+		if dimension < 2:
+			return 
+
+		self._dimension = dimension
+		self._maxvalue = maxvalue
+		self._points = [
+			Point(*[0 for _ in range(dimension)]) 
+			for _ in range(dimension)
+		]
+
+	@property
+	def dimension(self) -> int:
+		return self._dimension
+
+	def generate_random_plane_points(self):
+		for i in range(self.dimension):
+			point = Point.generate_random_point(self.dimension, self._maxvalue)
+			self._points[i] = point
+
+	def set_points(self, points: list[Point]):
+		if not points:
+			points = []
+
+		conditions = [
+			point.dimension == self.dimension
+			for point in points
+		]
+
+		if len(conditions) == self.dimension and False not in conditions:
+			self._points = points
+
+	def to_points_form(self):
+		pnames = []
+		for _ in range(self.dimension):
+			pnames.append(generate_point_name(*pnames))
+
+		points = [
+			self._points[i].to_str(pnames[i])
+			for i in range(self.dimension)
+		]
+
+		return ", ~ ".join(points)
+
+	def to_planar_form(self):
+		variables = generate_variables(self.dimension)
+
+		top_vector = Matrix.Vector.from_list([
+			Expression.LinearExpression(variables[i]) - self._points[0].point[i]
+			for i in range(self.dimension)
+		])
+		other_vectors = [
+			Matrix.Vector.from_list([
+				self._points[i].point[j] - self._points[0].point[j]
+				for j in range(self.dimension)
+			])
+			for i in range(1, self.dimension)
+		]
+
+		matrix = Matrix.Matrix.from_list_of_vectors([top_vector] + other_vectors)
+		expression = matrix.determinant()
+		mul = expression.get_common_multiplicator()
+		
+		expression = expression*(1/mul)
+		expression.int()
+		expression.shuffle()
+		expression.as_positive()
+		
+		coeff = expression.get_free_coefficient()*(-1)
+		
+		if coeff.is_positive():
+			expression = expression + coeff
+			coeff = coeff.to_str()
+		else:
+			coeff = ""
+		
+		if not coeff:
+			coeff = "0"
+
+		return f"{expression.to_str()} = {coeff}"
+
 
 def main(*args):
 
 	line = Line(2)
 	line.generate_random_line_points()
-	print(line.to_points_form())
-	print(line.to_canonical_form())
-	print(line.to_parametric_form())
-	print(line.to_random_form())
+	# print(line.to_points_form())
+	# print(line.to_canonical_form())
+	# print(line.to_parametric_form())
+	# print(line.to_random_form())
 
 	print()
 
 	line = Line(3)
 	line.generate_random_line_points()
-	print(line.to_points_form())
-	print(line.to_canonical_form())
-	print(line.to_parametric_form())
-	print(line.to_random_form())
+	# print(line.to_points_form())
+	# print(line.to_canonical_form())
+	# print(line.to_parametric_form())
+	# print(line.to_random_form())
+
+	hplane = HyperPlane(3)
+	hplane.generate_random_plane_points()
+	print(hplane.to_points_form())
+	print(hplane.to_planar_form())
 
 
 if __name__ == "__main__":
