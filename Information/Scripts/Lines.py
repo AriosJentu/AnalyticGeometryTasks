@@ -27,11 +27,15 @@ def generate_variables(size: int = 2) -> list[Expression.Variable]:
 		for var in (basic + other)[:size]
 	]
 
-def generate_parameter(dimension: int = 2) -> Expression.Variable:
+def generate_parameters(dimension: int = 2, count: int = 1) -> list[Expression.Variable]:
+	variables = ["t", "v"]
+	other = [chr(ord("g")+i) for i in range(count-2)]
+	variables = [Expression.Variable(i) for i in variables+other]
+
 	if dimension <= 4:
-		return Expression.Variable("t")
+		return variables[:count]
 	else:
-		return Expression.Variable("v")
+		return variables[1:count+1]
 
 class Point:
 
@@ -100,6 +104,9 @@ class Point:
 	def __str__(self) -> str:
 		return self.to_str()
 
+	def __repr__(self) -> str:
+		return self.to_str()
+
 	def __add__(self, point: 'Point') -> 'Point':
 		return self.add(point)
 
@@ -140,7 +147,13 @@ class Line:
 	def to_points_form(self):
 		pointM = generate_point_name()
 		pointN = generate_point_name(pointM)
-		return f"{self._point1.to_str(pointM)}, ~ {self._point2.to_str(pointN)}"
+		p1 = self._point1.to_str(pointM)
+		p2 = self._point2.to_str(pointN)
+
+		result = f"&{p1}\\\\\n\t\t\t&{p2}"
+		return f"""\t\t\\left[ \\begin{{split}}
+			{result}
+		\\end{{split}} \\right."""
 
 	def to_canonical_form(self):
 		
@@ -162,7 +175,7 @@ class Line:
 
 		parts = []
 		variables = generate_variables(self.dimension)
-		parameter = generate_parameter(self.dimension)
+		parameter = generate_parameters(self.dimension)[0]
 
 		pdiff = self._point2 - self._point1
 
@@ -213,7 +226,7 @@ class HyperPlane:
 			point = Point.generate_random_point(self.dimension, self._maxvalue)
 			self._points[i] = point
 
-	def set_points(self, points: list[Point]):
+	def set_points(self, *points: tuple[Point]):
 		if not points:
 			points = []
 
@@ -231,13 +244,16 @@ class HyperPlane:
 			pnames.append(generate_point_name(*pnames))
 
 		points = [
-			self._points[i].to_str(pnames[i])
+			"&"+self._points[i].to_str(pnames[i])
 			for i in range(self.dimension)
 		]
 
-		return ", ~ ".join(points)
+		result = "\\\\\n\t\t\t".join(points)
+		return f"""\t\t\\left[ \\begin{{split}}
+			{result}
+		\\end{{split}} \\right."""
 
-	def to_planar_form(self):
+	def to_canonical_form(self):
 		variables = generate_variables(self.dimension)
 
 		top_vector = Matrix.Vector.from_list([
@@ -274,6 +290,41 @@ class HyperPlane:
 
 		return f"{expression.to_str()} = {coeff}"
 
+	def to_parametric_form(self):
+		variables = generate_variables(self.dimension)
+		parameters = generate_parameters(self.dimension, self.dimension-1)
+
+		expressions = []
+		for i in range(self.dimension):
+			expr = Expression.LinearExpression()
+			for j in range(self.dimension-1):
+				difvar = self._points[j+1].point[i] - self._points[0].point[i]
+				expr = expr + parameters[j]*difvar
+			expr = expr + self._points[0].point[i]
+			expr.shuffle()
+			expressions.append(expr)
+		
+		parts = [
+			f"{variables[i]} &= {expr.to_str()}" 
+			for i, expr in enumerate(expressions)
+		]
+		result = " \\\\\n\t\t\t".join(parts)
+
+		return f"""\t\t\\left\\lbrace \\begin{{split}}
+			{result}
+		\\end{{split}} \\right."""
+
+	def to_random_form(self):
+		form = random.choice([
+			self.to_points_form,
+			self.to_canonical_form,
+			self.to_parametric_form
+		])
+		return form()
+
+	def __str__(self):
+		return self.to_random_form()
+
 
 def main(*args):
 
@@ -293,10 +344,38 @@ def main(*args):
 	# print(line.to_parametric_form())
 	# print(line.to_random_form())
 
-	hplane = HyperPlane(3)
+	hplane = HyperPlane(2)
 	hplane.generate_random_plane_points()
+	# print(hplane.to_points_form())
+	# print(hplane.to_canonical_form())
+	# print(hplane.to_parametric_form())
+
+	hplane = HyperPlane(4)
+	hplane.generate_random_plane_points()
+	# print(hplane.to_points_form())
+	# print(hplane.to_canonical_form())
+	# print(hplane.to_parametric_form())
+
+	points = [Point(random.randint(0, 5), random.randint(0, 5)), Point(random.randint(0, 5), random.randint(0, 5))]
+	points = [Point(1, 5), Point(1, 5)]
+
+	line = Line(2)
+	line.set_points(*points)
+
+	hplane = HyperPlane(2)
+	hplane.set_points(*points)
+
+	print(line.to_points_form())
 	print(hplane.to_points_form())
-	print(hplane.to_planar_form())
+	print()
+
+	print(line.to_canonical_form())
+	print(hplane.to_canonical_form())
+	print()
+	
+	print(line.to_parametric_form())
+	print(hplane.to_parametric_form())
+	print()
 
 
 if __name__ == "__main__":
