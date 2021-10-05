@@ -11,35 +11,42 @@ event_number = 2
 prefix = "Tasks/Homework2/"
 
 def tasks_updater(text):
-	line = Lines.Line(3)
-	plane = Lines.HyperPlane(3)
+	
+	sprod2 = Lines.ScalarProduct(2)
+	sprod3 = Lines.ScalarProduct(3)
 
-	line.generate_random_line_points()
-	text = text.replace("#LINEPOINTS#", line.to_points_form())
+	sprod2.generate_random_vectors()
+	text = text.replace("#SCALARS#", sprod2.to_vectors_form())
 
-	plane.generate_random_plane_points()
-	text = text.replace("#PLANEPOINTS#", plane.to_points_form())
+	sprod2.generate_random_vectors()
+	text = text.replace("#SCALARLENGTH1#", sprod2.to_length_scalar_product_form())
 	
-	line.generate_random_line_points()
-	text = text.replace("#LINE1#", line.to_random_form())
+	sprod2.generate_random_vectors()
+	text = text.replace("#SCALARLENGTH2#", sprod2.to_length_scalar_product_form())
 	
-	line.generate_random_line_points()
-	text = text.replace("#LINE2#", line.to_random_form())
+	sprod2.generate_random_vectors()
+	text = text.replace("#SCALARPRODUCT#", sprod2.to_scalar_product_form())
 	
-	plane.generate_random_plane_points()
-	text = text.replace("#PLANE1#", plane.to_random_form())
+	sprod2.generate_random_vectors()
+	text = text.replace("#SCALARPRODUCTLINEAR#", sprod2.to_linear_scalar_product_form())
 	
-	plane.generate_random_plane_points()
-	text = text.replace("#PLANE2#", plane.to_random_form())
+	sprod2.generate_random_vectors()
+	sprod3.generate_random_vectors()
+	text = text.replace("#SCALARANGLE1#", sprod2.to_lengths_form())
+	text = text.replace("#SCALARANGLE2#", sprod3.to_lengths_form())
 	
-	text = text.replace("#POINT#", Lines.Point.generate_random_point(3).to_str(
-		Lines.generate_point_name()
-	))
+	sprod3.generate_random_vectors()
+	text = text.replace("#SCALARPROD3#", sprod3.to_scalar_product_form())
+	
+	sprod3.generate_random_vectors()
+	text = text.replace("#SCALARPROD3LENGTH#", sprod3.to_linear_scalar_product_form())
+
+
 
 	return text
 
 tasks = []
-for i in range(6):
+for i in range(5):
 	tasks_i = Imports.Tasks.SpecificTasks()
 	task_i = Imports.Tasks.SpecificTaskInfo(prefix+f"Task{i+1}.tex")
 	task_i.set_updater_function(tasks_updater)
