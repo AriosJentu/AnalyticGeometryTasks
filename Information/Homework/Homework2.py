@@ -41,8 +41,6 @@ def tasks_updater(text):
 	sprod3.generate_random_vectors()
 	text = text.replace("#SCALARPROD3LENGTH#", sprod3.to_linear_scalar_product_form())
 
-
-
 	return text
 
 tasks = []

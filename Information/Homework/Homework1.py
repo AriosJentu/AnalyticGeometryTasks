@@ -29,6 +29,17 @@ def tasks_updater(text):
 		Lines.generate_point_name()
 	))
 
+	if text.find("\\left[") >= 0:
+		text = text.replace("#R#", ", заданной точками")
+		text = text.replace("#RS#",
+			", где одна из них задана точками"
+			if text.count("\\left[") == 1 else
+			", заданных точками"
+		)
+		
+	text = text.replace("#R#", "")
+	text = text.replace("#RS#", "")
+
 	return text
 
 tasks = []
