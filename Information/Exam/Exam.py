@@ -64,8 +64,8 @@ def tasks_updater(text):
 		Lines.generate_point_name()
 	))
 
-	text = text.replace("#VECTOR1#", Lines.Vector.generate_random_point(3).to_str())
-	text = text.replace("#VECTOR2#", Lines.Vector.generate_random_point(3).to_str())
+	text = text.replace("#VECTOR1#", Lines.Vector.generate_random_vector(3).to_str())
+	text = text.replace("#VECTOR2#", Lines.Vector.generate_random_vector(3).to_str())
 
 	text = text.replace("#COORDSYSTEM#", random.choice(["сферической", "циллиндрической"]))
 	text = text.replace("#PLANETYPE#", random.choice(["параметрическое", "каноническое"]))
