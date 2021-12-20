@@ -4,6 +4,7 @@ from ..Default import Homework
 import Modules.Imports as Imports
 
 from ..Scripts import Lines
+from ..Scripts import TextReplacer
 
 control_event = "Индивидуальное домашнее задание"
 event_number = 3
@@ -36,31 +37,7 @@ def tasks_updater(text):
 		Lines.generate_point_name()
 	))
 
-	if text.find("\\left[") >= 0:
-		text = text.replace("#R#", ", заданной точками")
-		text = text.replace("#RS#",
-			", где одна из них задана точками"
-			if text.count("\\left[") == 1 else
-			", заданных точками"
-		)
-
-		if text.rfind("\\left[") > text.rfind(";") and text.find("#RG#") >= 0:
-			text = text.replace("#RG#", 
-				", заданной точками"
-				if text.count("\\left[") == 1 else
-				", заданных точками"
-			)
-		elif text.rfind("\\left[") < text.rfind(";") and text.find("#RG#") >= 0:
-			text = text.replace("#RH#",
-				", заданной точками"
-				if text.count("\\left[") == 1 else
-				""
-			)
-
-	text = text.replace("#R#", "")
-	text = text.replace("#RS#", "")
-	text = text.replace("#RG#", "")
-	text = text.replace("#RH#", "")
+	text = TextReplacer.text_replacer(text)
 
 	return text
 
@@ -81,6 +58,7 @@ exercises = []
 for taskinfo in tasksinfo:
 	exercise = Imports.Excercises.Excercise(taskinfo)
 	exercises.append(exercise)
+
 
 class Homework3(Imports.Assignments.Assignment):
 
