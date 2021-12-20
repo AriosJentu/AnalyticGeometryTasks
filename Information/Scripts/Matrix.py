@@ -84,7 +84,18 @@ class Vector:
 		return """\\begin{{pmatrix}}
 			{vector}
 		\\end{{pmatrix}}""".format(
-			vector = ' \\\\\n\t\t\t'.join([str(i) for i in self.vector])
+			vector = ' \\\\\n\t\t\t'.join([
+				self.value_to_latex(i) for i in self.vector
+			])
+		)
+
+	def to_latex_floats(self) -> str:
+		return """\\begin{{pmatrix}}
+			{vector}
+		\\end{{pmatrix}}""".format(
+			vector = ' \\\\\n\t\t\t'.join([
+				self.value_to_latex(i, True) for i in self.vector
+			])
 		)
 
 	def distance(self) -> float:
@@ -98,6 +109,15 @@ class Vector:
 				res_value = abs(value)
 
 		return res_value, res_index 
+
+	def value_to_latex(self, value: (int, float, str), replaces: bool = False):
+		res = str(value)
+		if res.find("e") >= 0 and replaces:
+			res = res.replace("e", " \\cdot 10^{")
+			res += "}"
+
+		return res
+
 
 	def __getitem__(self, item: int) -> float:
 		if isinstance(item, slice):
@@ -159,6 +179,19 @@ class Matrix:
 		return matrix
 
 	@staticmethod
+	def from_vector(vec: Vector, vertical: bool = True) -> "Matrix":
+
+		if vertical:
+			matrix = Matrix(len(vec), 1)
+			for index, value in enumerate(vec):
+				matrix[index][0] = value
+		else:
+			matrix = Matrix(1, len(vec))
+			matrix[0] = vec
+
+		return matrix
+
+	@staticmethod
 	def from_list_of_lists(lst: list[list]) -> "Matrix":
 		matrix = Matrix(len(lst), len(lst[0]))
 		for index, element in enumerate(lst):
@@ -182,22 +215,63 @@ class Matrix:
 	@staticmethod
 	def generate_matrix_with_eigenvalues(
 		values: list["Root"] = None, 
-		linear_dependency: dict["Root", int] = None
+		linear_dependency: dict["Root", int] = None,
+		direction: dict["Root", int] = None,
+		with_complex: bool = False
 	):
+		if not linear_dependency:
+			linear_dependency = {}
+
+		if not direction:
+			direction = {}
+
 		values = sorted(values)
 		size = len(values)
 		matrix = Matrix(size, size)
 
 		for i in range(size):
 			root = values[i]
-			matrix[i][i] = values[i]
+			prevroot = values[(i-1)%size]
+			nextroot = values[(i+1)%size]
+			matrix[i][i] = root
+
+			if not with_complex:
+				if hasattr(root, "imag") and root.imag != 0:
+					realp = root.real
+					complexp = root.imag
+
+					if realp == int(realp):
+						realp = int(realp)
+					if complexp == int(complexp):
+						complexp = int(complexp)
+
+					if (
+								hasattr(prevroot, "imag") 
+							and root == prevroot.conjugate()
+					):
+						matrix[i][i] = realp
+						matrix[i-1][i] = complexp
+					elif (
+								hasattr(nextroot, "imag") 
+							and root == nextroot.conjugate()
+					):
+						matrix[i][i] = realp
+						matrix[i+1][i] = complexp
+
 
 			if (
 					linear_dependency.get(root) != None 
 				and	linear_dependency[root] > 0 
-				and	values[i+1] == values[i]
+				and	nextroot == root
 			):
-				matrix[i][i+1] = 1
+				if (
+						direction.get(root) != None 
+					and	direction[root] < 0 
+				):
+					matrix[i+1][i] = 1
+				else:
+					matrix[i][i+1] = 1
+	
 				linear_dependency[root] -= 1
 
 		return matrix
@@ -320,7 +394,6 @@ class Matrix:
 
 		return identity
 
-
 	def __check_size__(self, mtx: "Matrix") -> bool:
 		return (
 				isinstance(mtx, Matrix)
@@ -381,7 +454,7 @@ class Matrix:
 			return
 
 		newmatrix = Matrix(self.rows, self.columns)
-		for index, vector in self.matrix:
+		for index, vector in enumerate(self.matrix):
 			newmatrix[index] = vector + mtx[index]
 
 		return newmatrix
@@ -405,6 +478,17 @@ class Matrix:
 				newmatrix[row][column] = left*right
 
 		return newmatrix
+
+	def vector_multiply(self, vector: Vector, isleft: bool = False):
+		vec = Matrix.from_vector(vector, not isleft)
+
+		if isleft:
+			res = vec.multiply(self)
+		else:
+			res = self.multiply(vec).transpose()
+
+		return res[0]
+
 
 	def determinant(self):
 		if not self.is_square():
@@ -448,17 +532,41 @@ class Matrix:
 		self.matrix[from_row], self.matrix[to_row] =\
 			self.matrix[to_row], self.matrix[from_row]
 
-	def inverse(self) -> ("Matrix", float):
+	def inverse(self, 
+			rounding: bool = True, 
+			only_matrix: bool = False
+	) -> ("Matrix", float):
 		det = self.determinant()
 		if det == 0 or not self.is_square():
 			return
 
-		mtx = Matrix.from_list_of_lists(numpy.linalg.inv(self.matrix))
+		invdet = 1/det
+		if invdet == int(invdet):
+			invdet = int(invdet)
+
+		mtx = Matrix.from_list_of_lists([
+			[
+				float(col)
+				for col in row
+			]
+			for row in numpy.linalg.inv(self.matrix)
+		])
+
 		for row, line in enumerate(mtx):
 			for column, element in enumerate(line):
-				mtx[row][column] = round(element*det)
+				val = element
+				if rounding:
+					val = round(element*det)
 
-		return mtx, 1/det
+					if val == int(val):
+						val = int(val)
+
+				mtx[row][column] = val
+
+		if only_matrix:
+			return mtx
+
+		return mtx, invdet
 
 	def make_random_row_permutation(self, 
 			rows: list[int], 
@@ -551,13 +659,47 @@ class Matrix:
 		\\end{{pmatrix}}""".format(
 			matrix = ' \\\\\n\t\t\t'.join(
 				[" & ".join(
-					[str(i) for i in vector]
+					[vector.value_to_latex(i) for i in vector]
 				) for vector in self.matrix]
 			),
 			string = string
 		)
 
-	def maxabs(self, *except_rows: list[int]) -> [(float, complex, int), int, int]:
+	def norm(self):
+		if self.is_square():
+			
+			x = Vector.from_list([
+				1 + ((-i)**i)/self.rows for i in range(self.rows)
+			])
+
+			e = Vector.from_list([
+				(-1)**i * 1/(10*self.rows) 
+				for i in range(self.rows)
+			])
+
+			mtx_len = (self*x).distance()
+			vec_len = x.distance()
+
+			mtx_f_len = (self*e).distance()
+			vec_f_len = e.distance()
+
+			a = mtx_len/vec_len
+			b = mtx_f_len/vec_f_len
+
+			if b == 0:
+				return 1e16
+
+			return a/b
+
+	def cond(self):
+		a = self.norm()
+		b = self.inverse(only_matrix=True).norm()
+		return a*b
+
+	def maxabs(self, 
+			*except_rows: list[int]
+	) -> [(float, complex, int), int, int]:
+	
 		res_y_pos, res_x_pos, res_value = -1, -1, 0
 		for y_pos, vector in enumerate(self.matrix):
 			if y_pos not in except_rows:
@@ -570,12 +712,24 @@ class Matrix:
 		return res_value, res_y_pos, res_x_pos 
 
 	@staticmethod
-	def multiplication(matrix: "Matrix", element: (float, "Matrix")):
-		if isinstance(element, (float, int, complex)):
-			return matrix.scale(element)
+	def multiplication(
+			leftoperand: (float, "Matrix", Vector), 
+			rightoperand: (float, "Matrix", Vector)
+	):
+		if isinstance(leftoperand, (float, int, complex)):
+			leftoperand, rightoperand = rightoperand, leftoperand
 
-		elif isinstance(element, Matrix):
-			return matrix.multiply(element)
+		if isinstance(rightoperand, (float, int, complex)):
+			return leftoperand.scale(rightoperand)
+
+		elif isinstance(rightoperand, Matrix):
+			return leftoperand.multiply(rightoperand)
+
+		if isinstance(leftoperand, Vector):
+			return rightoperand.vector_multiply(leftoperand, True)
+
+		if isinstance(rightoperand, Vector):
+			return leftoperand.vector_multiply(rightoperand)
 
 	def __add__(self, mtx: "Matrix") -> "Matrix":
 		return self.add(mtx)
@@ -586,7 +740,7 @@ class Matrix:
 	def __mul__(self, element: (float, "Matrix")) -> "Matrix":
 		return Matrix.multiplication(self, element)
 
-	def __rmul__(self, element: "Matrix") -> "Matrix":
+	def __rmul__(self, element: (float, "Matrix")) -> "Matrix":
 		return Matrix.multiplication(element, self)
 
 	def __getitem__(self, item: int) -> Vector:
@@ -601,6 +755,9 @@ class Matrix:
 
 	def __abs__(self):
 		return self.determinant()
+
+	def __len__(self):
+		return self.norm()
 
 	def __str__(self) -> str:
 		return f"""Matrix{self.rows}x{self.columns}({
@@ -669,7 +826,7 @@ if __name__ == "__main__":
 
 	mtx6 = Matrix.generate_random_det1_matrix(3, no_zeros=True, minimize=True)
 	print(mtx6)
-	# print(mtx6.inverse()[0])
+	print(mtx6.inverse())
 	# print(mtx6.to_latex())
 	# print(mtx6[0].to_latex())
 	print()
@@ -692,10 +849,13 @@ if __name__ == "__main__":
 
 	from math import sqrt
 	
-	mtx8 = Matrix.from_list_of_lists([
-		[1/1 * sqrt(1/1), 0/1 * sqrt(1/1), 0/1 * sqrt(1/1)],
-		[0/1 * sqrt(1/1), 1/1 * sqrt(1/1), 0/1 * sqrt(1/1)],
-		[0/1 * sqrt(1/1), 0/1 * sqrt(1/1), 1/1 * sqrt(1/1)]
-	])
-	print(mtx8)
-	print(mtx8*mtx8.transpose())
+	# mtx8 = Matrix.from_list_of_lists([
+	# 	[1/1 * sqrt(1/1), 0/1 * sqrt(1/1), 0/1 * sqrt(1/1)],
+	# 	[0/1 * sqrt(1/1), 1/1 * sqrt(1/1), 0/1 * sqrt(1/1)],
+	# 	[0/1 * sqrt(1/1), 0/1 * sqrt(1/1), 1/1 * sqrt(1/1)]
+	# ])
+	# print(mtx8)
+	# print(mtx8*mtx8.transpose())
+
+	s = Vector.from_list(["x", "y", "z"])
+	print(s.to_latex())

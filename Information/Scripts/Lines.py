@@ -1,6 +1,28 @@
 import random
 import math
 
+POSITIVE_ANGLES = [
+	"\\dfrac{{\\pi}}{{6}}", 
+	"\\dfrac{{\\pi}}{{4}}", 
+	"\\dfrac{{\\pi}}{{3}}", 
+	"\\dfrac{{\\pi}}{{2}}", 
+	"\\dfrac{{2\\pi}}{{3}}",
+	"\\dfrac{{3\\pi}}{{4}}",
+	"\\dfrac{{5\\pi}}{{6}}",
+	"\\pi",
+	"\\dfrac{{7\\pi}}{{6}}", 
+	"\\dfrac{{5\\pi}}{{4}}", 
+	"\\dfrac{{4\\pi}}{{3}}", 
+	"\\dfrac{{3\\pi}}{{2}}", 
+	"\\dfrac{{5\\pi}}{{3}}", 
+	"\\dfrac{{7\\pi}}{{4}}", 
+	"\\dfrac{{7\\pi}}{{6}}", 
+]
+
+NEGATIVE_ANGLES = [f"-{i}" for i in POSITIVE_ANGLES[::-1]]
+
+ANGLES = NEGATIVE_ANGLES + ["0"] + POSITIVE_ANGLES
+
 if __package__ == "" or __package__ is None:
 	import Expression
 	import Fraction
@@ -184,13 +206,6 @@ class Vector(Point):
 		else:
 			return cls.generate_random_vector(dimension, maxvalue)
 
-	def as_point(self) -> str:
-		result = ", ".join([
-			str(Fraction.Fraction(i, self._root))
-			for i in self.point
-		])
-		return f"""\\left( {result} \\right)"""
-
 	def sum_squares(self) -> int:
 		return sum([i**2 for i in self.point])
 
@@ -234,6 +249,29 @@ class Vector(Point):
 			*(self/self.sum_squares()).point, 
 			root=self.sum_squares()
 		)
+
+	def vector_format(self, string: str) -> str:
+		return f"\\vec{{{string}}}"
+
+	def as_point(self) -> str:
+		result = ", ".join([
+			str(Fraction.Fraction(i, self._root))
+			for i in self.point
+		])
+		return f"""\\left( {result} \\right)"""
+
+	def as_vector(self) -> str:
+		result = ", ".join([
+			str(Fraction.Fraction(i))
+			for i in self.point
+		])
+		return f"""\\left\\lbrace {result} \\right\\rbrace"""
+
+	def to_str(self, name: str = None) -> str:
+		if not name:
+			return self.as_vector()
+		else:
+			return f"{self.vector_format(name)} = {self.as_vector()}"
 
 
 class Line:
@@ -742,6 +780,9 @@ def main(*args):
 	print(sprod.to_length_scalar_product_form())
 	# print(sprod.to_vectors_form())
 	# print(sprod.to_lengths_form())
+
+	vec = Vector(1, 2, 3)
+	print(vec.to_str("a"))
 
 
 
