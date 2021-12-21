@@ -92,11 +92,11 @@ def tasks_updater(text):
 		random.randint(-10, 10)
 	]).to_latex())
 
-	text = text.replace("#QUAT1#", Quaternions.Number.generate_random_number().to_str())
-	text = text.replace("#QUAT2#", Quaternions.Number.generate_random_number().to_str())
-	text = text.replace("#QUAT3#", Quaternions.Number.generate_random_number().to_str())
+	text = text.replace("#QUAT1#", str(Quaternions.Quaternion.generate_random_number()))
+	text = text.replace("#QUAT2#", str(Quaternions.Quaternion.generate_random_number()))
+	text = text.replace("#QUAT3#", str(Quaternions.Quaternion.generate_random_number()))
 
-	text = text.replace("#EXPRESSION#", Quaternions.Number.generate_expression())
+	text = text.replace("#EXPRESSION#", Quaternions.Expression.generate_expression())
 
 	text = TextReplacer.text_replacer(text)
 
@@ -125,13 +125,17 @@ task4 = Imports.Tasks.SpecificTaskInfo(prefix+f"Task4.tex")
 task4.set_updater_function(tasks_updater)
 tasks4.append(task4)
 
-
 tasks5 = Imports.Tasks.SpecificTasks()
 task5 = Imports.Tasks.SpecificTaskInfo(prefix+f"Task5.tex")
 task5.set_updater_function(tasks_updater)
 tasks5.append(task5)
 
-tasks = [tasks1, tasks2, tasks3, tasks4, tasks5]
+tasks6 = Imports.Tasks.SpecificTasks()
+task6 = Imports.Tasks.SpecificTaskInfo(prefix+f"Task6.tex")
+task6.set_updater_function(tasks_updater)
+tasks6.append(task6)
+
+tasks = [tasks1, tasks2, tasks3, tasks4, tasks5, tasks6]
 
 tasksinfo = []
 for task in tasks:
