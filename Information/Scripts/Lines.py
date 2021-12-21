@@ -149,6 +149,10 @@ class Point:
 		])
 		return f"""\\left( {result} \\right)"""
 
+	def as_real(self) -> str:
+		result = ", ".join([str(i) for i in self.point])
+		return f"""\\left( {result} \\right)"""
+
 	def to_str(self, name: str = None) -> str:
 		if not name:
 			return self.as_point()
@@ -166,6 +170,12 @@ class Point:
 
 	def __sub__(self, point: 'Point') -> 'Point':
 		return self.add(point.multiply(-1))
+
+	def __neg__(self) -> 'Point':
+		return self*(-1)
+
+	def __pos__(self) -> 'Point':
+		return self*1
 
 	def __mul__(self, value: float) -> 'Point':
 		return self.multiply(value)
@@ -219,11 +229,29 @@ class Vector(Point):
 
 		return sums
 
+	def cross_product(self, vector: 'Vector') -> 'Vector':
+		if self.dimension == vector.dimension == 3:
+			a, b, c = self.x, self.y, self.z
+			f, g, h = vector.x, vector.y, vector.z
+
+			p1 = abs(Matrix.Matrix.from_list_of_lists([[b, c], [g, h]]))
+			p2 = -abs(Matrix.Matrix.from_list_of_lists([[a, c], [f, h]]))
+			p3 = abs(Matrix.Matrix.from_list_of_lists([[a, b], [f, g]]))
+
+			return Vector(p1, p2, p3)
+
+	def add(self, vector: 'Vector') -> 'Vector':
+		if self.dimension == vector.dimension:
+			return Vector(*[ 
+				self.point[i] + vector.point[i] 
+				for i in range(self.dimension) 
+			])
+
 	def multiply(self, element: (float, 'Vector')) -> ('Vector', float):
 		if isinstance(element, Vector):
 			return self.dot_product(element)
 		else:
-			return super().multiply(element)
+			return Vector(*[i*element for i in self.point])
 
 	def len(self) -> float:
 		return self.sum_squares()**(1/2)
@@ -267,11 +295,21 @@ class Vector(Point):
 		])
 		return f"""\\left\\lbrace {result} \\right\\rbrace"""
 
+	def as_real(self) -> str:
+		result = ", ".join([str(i) for i in self.point])
+		return f"""\\left\\lbrace {result} \\right\\rbrace"""
+
 	def to_str(self, name: str = None) -> str:
 		if not name:
 			return self.as_vector()
 		else:
 			return f"{self.vector_format(name)} = {self.as_vector()}"
+
+	def __pow__(self, vector: 'Vector') -> 'Vector':
+		return self.cross_product(vector)
+
+	def __rpow__(self, vector: 'Vector') -> 'Vector':
+		return vector.cross_product(self)
 
 
 class Line:
