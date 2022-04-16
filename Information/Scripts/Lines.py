@@ -19,9 +19,22 @@ POSITIVE_ANGLES = [
 	"\\dfrac{{7\\pi}}{{6}}", 
 ]
 
+POSITIVE_DOUBLE_ANGLES = [
+	"\\dfrac{{\\pi}}{{3}}", 
+	"\\dfrac{{\\pi}}{{2}}", 
+	"\\dfrac{{2\\pi}}{{3}}",
+	"\\pi",
+	"\\dfrac{{4\\pi}}{{3}}", 
+	"\\dfrac{{3\\pi}}{{2}}", 
+	"\\dfrac{{5\\pi}}{{3}}", 
+]
+
+
 NEGATIVE_ANGLES = [f"-{i}" for i in POSITIVE_ANGLES[::-1]]
+NEGATIVE_DOUBLE_ANGLES = [f"-{i}" for i in POSITIVE_DOUBLE_ANGLES[::-1]]
 
 ANGLES = NEGATIVE_ANGLES + ["0"] + POSITIVE_ANGLES
+ANGLES_DOUBLE = NEGATIVE_DOUBLE_ANGLES + ["0"] + POSITIVE_DOUBLE_ANGLES
 
 if __package__ == "" or __package__ is None:
 	import Expression

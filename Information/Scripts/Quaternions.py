@@ -201,6 +201,7 @@ if __name__ == "__main__":
 
 	z = Quaternion(1, Vector(1, 1, 0))
 	# print(3*z.inverse())
+	# print(3/z)
 
 	#--------------------------------------------------------------------------------------------------------------------------
 
@@ -228,9 +229,41 @@ if __name__ == "__main__":
 		return point1
 
 	#Rotation examples:
-	print(rotate(Vector(1, 0, 0), Vector(0, 1, 0), math.pi/2).to_str())
-	print(rotate(Vector(1, 0, 0), Vector(1, 1, 0), math.pi).to_str())
-	print(rotate(Vector(1, 0, 0), Vector(0, 0, 1), math.pi/2).to_str())
+	# print(rotate(Vector(1, 0, 0), Vector(0, 1, 0), math.pi/2).to_str())
+	# print(rotate(Vector(1, 0, 0), Vector(1, 1, 0), math.pi).to_str())
+	# print(rotate(Vector(1, 0, 0), Vector(0, 0, 1), math.pi/2).to_str())
 
+	w1 = Quaternion.from_values(0, 2, -1, 1)
+	w2 = Quaternion.from_values(-2, -3, 0, 1)
+	w3 = Quaternion.from_values(2, -3, -1, -3)
+
+	# print(w1*w2)
+	# print(w3.inverse())
+	# print(23*(w1*w2)/w3)
+
+	sq = 3**(1/2)
+	a1 = math.cos(math.pi/3)
+	a2 = -math.sin(math.pi/3)
+	c = 1/199
+
+	p = Quaternion.from_values(0, -9, -4, -9)
+	axis = Quaternion.from_values(0, -5, -5, -4)
+	q = Quaternion.from_values(1/2, -5*sq/2, -5*sq/2, -2*sq)
+	qinv = Quaternion.from_values(2*c, 10*c*sq, 10*c*sq, 8*c*sq)
+
+	p = Quaternion.from_values(0, math.pi/4, math.pi/4, 0)
+	q = Quaternion.from_values(0, 1, 0, 0)
+	qinv = q.inverse()
+
+	p2 = q*p*qinv
+	# print(p2)
+	# print((p2.imag).as_real())
+	print(rotate(Vector(-9, -4, -9), Vector(-5, -5, -4), -2*math.pi/3).as_real())
+
+
+	# q = Quaternion.from_values(3, 0, 2, -3)
+	# print(q)
+	# print(q.inverse()*22)
+	# print(q*q.inverse())
 
 	#--------------------------------------------------------------------------------------------------------------------------

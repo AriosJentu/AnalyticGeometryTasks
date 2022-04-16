@@ -69,6 +69,9 @@ def tasks_updater(text):
 
 	text = text.replace("#COORDSYSTEM#", random.choice(["сферической", "циллиндрической"]))
 	text = text.replace("#PLANETYPE#", random.choice(["параметрическое", "каноническое"]))
+	
+	text = text.replace("#COORDSYSTEME#", random.choice(["spherical", "cylindrical"]))
+	text = text.replace("#PLANETYPEE#", random.choice(["parametric", "canonical"]))
 
 	text = text.replace("#SURFACE1#", SurfaceEquations.generate_task_string())
 	text = text.replace("#SURFACEPOINT1#", SurfacePointEquations.generate_task_string())
@@ -79,6 +82,7 @@ def tasks_updater(text):
 
 	text = text.replace("#MATRIX#", Lines.Matrix.Matrix.generate_random_detn_matrix(3).to_latex())
 	
+	text = text.replace("#DANGLE1#", random.choice(Lines.ANGLES_DOUBLE))
 	text = text.replace("#OLDVECTOR#", Lines.Matrix.Vector.from_list(
 		["x", "y", "z"]).to_latex()
 	)
