@@ -34,7 +34,7 @@ SurfacePointEquations.read_information()
 
 #Task3:
 # - V1: Find new equation of surface after moving and rotating axis
-# - V1: Find new equation of surface with transposition matrix
+# - V2: Find new equation of surface with transposition matrix
 
 #Task4:
 # - Transpose equation to cyllindric/spherical coordinates
