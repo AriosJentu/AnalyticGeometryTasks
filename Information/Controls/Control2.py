@@ -69,7 +69,7 @@ tasks2.append(task21)
 tasks.append(tasks2)
 
 tasks3 = Imports.Tasks.SpecificTasks()
-task31 = Imports.Tasks.SpecificTaskInfo(f"{prefix}Task3/Variant1.tex")
+task31 = Imports.Tasks.SpecificTaskInfo(f"{prefix}Task3/Variant1_1.tex")
 task31.set_updater_function(tasks_updater)
 tasks3.append(task31)
 tasks.append(tasks3)
