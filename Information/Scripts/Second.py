@@ -48,6 +48,19 @@ class SecondOrder:
 
 		self.variables = Matrix.Vector.from_list(generate_variables(self.dimension))
 
+
+	@staticmethod
+	def generate_random(dimension: int, steps: int = 3):
+
+		seconds = Matrix.Matrix.generate_random_det1_matrix(size=dimension, max_steps=steps)
+
+		s = Matrix.Matrix.generate_matrix_with_eigenvalues(values=[random.randint(-5, 5) for i in range(dimension)])
+		firsts = Matrix.Vector.from_list([s[i][i] for i in range(dimension)])
+		free = random.randint(-10, 10)
+
+		return SecondOrder(dimension, seconds, firsts, free)
+
+
 	def to_expr(self):
 		left = Matrix.Matrix.from_vector(self.variables, False)
 		simple = sympy.nsimplify(
@@ -75,7 +88,7 @@ class SecondOrderCurves(SecondOrder):
 		super().__init__(2, seconds, firsts, free)
 
 	@staticmethod
-	def generate_ellipse(horizontal: float, vertical: float, centered: tuple[float, float]):
+	def generate_ellipse(horizontal: float, vertical: float, centered: tuple[float, float], debug: bool = False):
 		a = horizontal
 		b = vertical
 		c, d = centered
@@ -84,10 +97,13 @@ class SecondOrderCurves(SecondOrder):
 		vec = Matrix.Vector.from_list([-2*c/a**2, -2*d/b**2])
 		free = c**2/a**2 + d**2/b**2 - 1
 
-		return SecondOrderCurves(mtx, vec, free)
+		if not debug:
+			return SecondOrderCurves(mtx, vec, free)
+
+		return SecondOrderCurves(mtx, vec, free), sympy.nsimplify(abs(free))
 
 	@staticmethod
-	def generate_hyperbola(horizontal: float, vertical: float, centered: tuple[float, float]):
+	def generate_hyperbola(horizontal: float, vertical: float, centered: tuple[float, float], debug: bool = False):
 		a = horizontal
 		b = vertical
 		c, d = centered
@@ -96,10 +112,13 @@ class SecondOrderCurves(SecondOrder):
 		vec = Matrix.Vector.from_list([-2*c/a**2, 2*d/b**2])
 		free = c**2/a**2 - d**2/b**2 - 1
 
-		return SecondOrderCurves(mtx, vec, free)
+		if not debug:
+			return SecondOrderCurves(mtx, vec, free)
+
+		return SecondOrderCurves(mtx, vec, free), sympy.nsimplify(abs(free))
 
 	@staticmethod
-	def generate_parabola(parameter: float, centered: tuple[float, float]):
+	def generate_parabola(parameter: float, centered: tuple[float, float], debug: bool = False):
 		p = parameter
 		c, d = centered
 
@@ -107,7 +126,10 @@ class SecondOrderCurves(SecondOrder):
 		vec = Matrix.Vector.from_list([-2*p, -2*d])
 		free = d**2 + 2*p*c
 
-		return SecondOrderCurves(mtx, vec, free)
+		if not debug:
+			return SecondOrderCurves(mtx, vec, free)
+
+		return SecondOrderCurves(mtx, vec, free), sympy.nsimplify(abs(free))
 
 if __name__ == "__main__":
 
@@ -145,7 +167,9 @@ if __name__ == "__main__":
 	# 	s.append(SecondOrderCurves.generate_hyperbola(*func()))
 		
 	for i in range(30):
-		s.append(SecondOrderCurves.generate_parabola( *(list(func())[1:]) ))
+		# s.append(SecondOrder.generate_random(3))
+		# s.append(SecondOrderCurves.generate_parabola( *(list(func())[1:]) ))
+		s.append(SecondOrderCurves.generate_hyperbola( *(list(func())) ))
 
 	random.shuffle(s)
 	for i in s:
