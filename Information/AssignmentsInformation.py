@@ -8,6 +8,7 @@ from .Homework import Homework3
 from .Controls import Control1
 from .Controls import Control2
 from .Controls import Control3
+from .Controls import Control4
 from .Exam import Exam
 from .Comission import Comission
 
@@ -20,6 +21,7 @@ AssignmentsInformation.set_description("h", "Homework tasks for analytic geometr
 AssignmentsInformation.append(Control1.Control1, "c")
 AssignmentsInformation.append(Control2.Control2, "c")
 AssignmentsInformation.append(Control3.Control3, "c")
+AssignmentsInformation.append(Control4.Control4, "c")
 AssignmentsInformation.set_description("c", "Control tasks for analytic geometry course")
 
 AssignmentsInformation.append(Exam.Exam, "e")

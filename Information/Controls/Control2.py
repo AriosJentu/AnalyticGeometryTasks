@@ -1,78 +1,72 @@
 import random
 
-from ..Default import ControlLonger
+from ..Default import Control
 import Modules.Imports as Imports
 
 from ..Scripts import Lines
+from ..Scripts import Second
 from ..Scripts import TextReplacer
 
 control_event = "Контрольная работа"
-# control_event = "Контрольная работа на тему <<Преобразования координат>>"
+# control_event = "Контрольная работа на тему <<Кривые и поверхности второго порядка>>"
 event_number = 2
 
-prefix = "Tasks/Exam/"
+prefix = "Tasks/Seconds/"
 
-SurfaceEquations = Imports.Tasks.TasksGetter(prefix+"Special/Surfaces.tex")
-SurfaceEquations.add_prefix_path(Imports.MODULE_PATH)
-SurfaceEquations.read_information()
+def parameters():
+		
+	rad1 = random.randint(1, 9)
+	rad2 = random.randint(1, 9)
+	pt1 = random.randint(-10, 10)
+	pt2 = random.randint(-10, 10)
+
+	return rad1, rad2, (pt1, pt2)
+
+def get_random():
+	curves = [
+		Second.SecondOrderCurves.generate_ellipse( *(list(parameters())), True),
+		Second.SecondOrderCurves.generate_hyperbola( *(list(parameters())), True),
+		Second.SecondOrderCurves.generate_parabola( *(list(parameters())[1:]), True),
+
+		Second.SecondOrderCurves.generate_ellipse( *(list(parameters())), True),
+		Second.SecondOrderCurves.generate_hyperbola( *(list(parameters())), True),
+	]
+
+	for i, curve in enumerate(curves):
+		if len(str(curve[1])) > 5:
+			curves[i] = 0
+
+	vals = [i[0] for i in curves if i != 0]
+
+	if len(vals) <= 1:
+		return get_random()
+	else:
+		return random.choice(vals)
+
 
 def tasks_updater(text):
 	random.seed()
 
-	text = text.replace("#POINT1#", Lines.Point.generate_random_point(3).to_str(
+	text = TextReplacer.text_replacer(text)
+	
+	text = text.replace("#POINT1#", Lines.Point.generate_random_point(2).to_str(
 		Lines.generate_point_name()
 	))
 
-	text = text.replace("#COORDSYSTEM#", random.choice(["сферической", "циллиндрической"]))
-	text = text.replace("#PLANETYPE#", random.choice(["параметрическое", "каноническое"]))
-	
-	text = text.replace("#COORDSYSTEME#", random.choice(["spherical", "cylindrical"]))
-	text = text.replace("#PLANETYPEE#", random.choice(["parametric", "canonical"]))
-
-	text = text.replace("#MATRIX#", Lines.Matrix.Matrix.generate_random_detn_matrix(3).to_latex())
-
-	text = text.replace("#ANGLE1#", random.choice(Lines.ANGLES))
-	text = text.replace("#ANGLE2#", random.choice(Lines.ANGLES))
-	text = text.replace("#ANGLE3#", random.choice(Lines.ANGLES))
-
-	text = text.replace("#OLDVECTOR#", Lines.Matrix.Vector.from_list(
-		["x", "y", "z"]).to_latex()
-	)
-	text = text.replace("#NEWVECTOR#", Lines.Matrix.Vector.from_list(
-		["\\tilde{{x}}", "\\tilde{{y}}", "\\tilde{{z}}"]).to_latex()
-	)
-
-	text = text.replace("#EXCHANGEVECTOR#", Lines.Matrix.Vector.from_list([
-		random.randint(-10, 10),
-		random.randint(-10, 10),
-		random.randint(-10, 10)
-	]).to_latex())
-
-	text = text.replace("#SURFACE1#", SurfaceEquations.generate_task_string())
-
-	text = TextReplacer.text_replacer(text)
+	text = text.replace("#SECONDS1#", f"\\[ {get_random()} = 0 \\]")
+	text = text.replace("#SECONDS2#", f"\\[ {Second.SecondOrder.generate_random(3, 2)} = 0 \\]")
 
 	return text
 
 tasks = []
 
-tasks1 = Imports.Tasks.SpecificTasks()
-task11 = Imports.Tasks.SpecificTaskInfo(f"{prefix}Task4.tex")
-task11.set_updater_function(tasks_updater)
-tasks1.append(task11)
-tasks.append(tasks1)
+for i in [1, 2, 3]:
 
-tasks2 = Imports.Tasks.SpecificTasks()
-task21 = Imports.Tasks.SpecificTaskInfo(f"{prefix}Task3/Variant2.tex")
-task21.set_updater_function(tasks_updater)
-tasks2.append(task21)
-tasks.append(tasks2)
-
-tasks3 = Imports.Tasks.SpecificTasks()
-task31 = Imports.Tasks.SpecificTaskInfo(f"{prefix}Task3/Variant1_1.tex")
-task31.set_updater_function(tasks_updater)
-tasks3.append(task31)
-tasks.append(tasks3)
+	tasks_i = Imports.Tasks.SpecificTasks()
+	task1_i = Imports.Tasks.SpecificTaskInfo(f"{prefix}Task{i}.tex")
+	task1_i.set_updater_function(tasks_updater)
+	tasks_i.append(task1_i)
+	tasks.append(tasks_i)
 
 task = Imports.Tasks.EmptyTask()
 tasks.append(task)
@@ -92,7 +86,7 @@ for index, taskinfo in enumerate(tasksinfo):
 
 class Control2(Imports.Assignments.Assignment):
 
-	layout = Imports.Documents.DocumentLayout(ControlLonger.LayoutLocation, ControlLonger.PageStyle)
+	layout = Imports.Documents.DocumentLayout(Control.LayoutLocation, Control.PageStyle)
 	test = Imports.Tests.Test(exercises)
 	document_entries = Imports.Entries.DocumentEntries(control_event=control_event, event_number=event_number)
 	prefix = "ageom_control"
