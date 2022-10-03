@@ -45,6 +45,7 @@ class SecondOrder:
 		self.seconds = seconds
 		self.firsts = firsts
 		self.free = free
+		self.transl_matrix = Matrix.Matrix.generate_diagonal_matrix(value=1, rows=dimension)
 
 		self.variables = Matrix.Vector.from_list(generate_variables(self.dimension))
 
@@ -62,28 +63,203 @@ class SecondOrder:
 
 
 	@staticmethod
-	def generate_random_3d_canonicasable(maxval: int = 7):
+	def generate_random_3d_canonicasable(maxval: int = 6, with_inv: bool = True, debug: bool = False):
+
+		def rand_wzero():
+			return random.randint(-maxval, maxval)
+
+		def rand_pos():
+			return random.randint(1, maxval)
+
+		def rand_neg():
+			return random.randint(-maxval, -1)
+
+		def rand_nneg():
+			return random.randint(0, maxval)
 
 		def rand_nzero():
-			return random.randint(-maxval, -1) if random.randint(0, 1) == 0 else random.randint(1, maxval)
+			return rand_neg() if random.randint(0, 9)%2 == 0 else rand_pos()
 
-		a, b, c = (rand_nzero() for i in range(3))
-		f, g, h = (random.randint(-maxval, maxval) for i in range(3))
-		p, q, r = (2*random.randint(-maxval, maxval) for i in range(3))
 
-		seconds = Matrix.Matrix.from_list_of_lists([[a, h, g], [h, b, f], [g, f, c]])
-		firsts = Matrix.Vector.from_list([p, q, r])
-		free = rand_nzero()
+		def rand_pos_sq():
+			return random.randint(1, maxval)**2
+
+		def rand_neg_sq():
+			return -random.randint(1, maxval)**2
+
+		def rand_nneg_sq():
+			return random.randint(0, maxval)**2
+
+		def rand_npos_sq():
+			return -random.randint(0, maxval)**2
+
+		def rand_nzero_sq():
+			return rand_neg_sq() if random.randint(0, 9)%2 == 0 else rand_pos_sq()
+
+		def rand_wzero_sq():
+			return rand_nneg_sq() if random.randint(0, 9)%2 == 0 else rand_npos_sq()
+
+
+		def rand_pos_sq_inv():
+			if with_inv:
+				return 1/rand_pos_sq()
+			else:
+				return rand_pos_sq()
+
+		def rand_neg_sq_inv():
+			if with_inv:
+				return 1/rand_neg_sq()
+			else:
+				return rand_neg_sq()
+
+		def rand_nzero_sq_inv():
+			return rand_neg_sq_inv() if random.randint(0, 9)%2 == 0 else rand_pos_sq_inv()
+
+
+		def rand_pos_sq_winv():
+			return rand_pos_sq() if random.randint(0, 9)%2 == 0 else rand_pos_sq_inv()
+
+		def rand_neg_sq_winv():
+			return rand_neg_sq() if random.randint(0, 9)%2 == 0 else rand_neg_sq_inv()
+
+		def rand_nzero_sq_winv():
+			return rand_nzero_sq() if random.randint(0, 9)%2 == 0 else rand_nzero_sq_inv()
+
+
+		def random_spherical():
+			k = rand_pos_sq_winv()
+			seconds = Matrix.Matrix.generate_matrix_with_eigenvalues([k for i in range(3)])
+			free = rand_nzero()
+
+			return seconds, free, None
+
+		def random_elliptical():
+			seconds = Matrix.Matrix.generate_matrix_with_eigenvalues([rand_pos_sq_winv() for i in range(3)])
+			free = rand_nzero_sq()
+
+			return seconds, free, None
+
+		def random_cone():
+			posit = random.randint(0, 2)
+			seconds = Matrix.Matrix.generate_matrix_with_eigenvalues([
+				rand_pos_sq_winv() if i != posit else rand_nzero_sq_winv()
+				for i in range(3) 
+			])
+			free = 0
+
+			return seconds, free, None
+
+		def random_elliptic_cylindrical():
+			posit = random.randint(0, 2)
+			seconds = Matrix.Matrix.generate_matrix_with_eigenvalues([
+				rand_pos_sq_winv() if i != posit else 0
+				for i in range(3) 
+			])
+			free = rand_nzero_sq()
+
+			return seconds, free, None
+
+		def random_elliptic_parabolloid():
+			posit = random.randint(0, 2)
+			seconds = Matrix.Matrix.generate_matrix_with_eigenvalues([
+				rand_pos_sq_winv() if i != posit else 0
+				for i in range(3) 
+			])
+			firsts = Matrix.Vector.from_list([
+				0 if i != posit else rand_neg() 
+				for i in range(3)
+			])
+			free = rand_nzero_sq()
+
+			return seconds, free, firsts
+
+		def random_hyperbolic_cylindrical():
+			posit1 = random.randint(0, 2)
+			posit2 = random.choice([i for i in range(2) if i != posit1])
+
+			seconds = Matrix.Matrix.generate_matrix_with_eigenvalues([
+				rand_pos_sq_winv() if (i != posit1 and i != posit2) 
+				else (rand_neg_sq_winv() if i != posit2 else 0)
+				for i in range(3) 
+			])
+			free = rand_nzero_sq()
+
+			return seconds, free, None
+
+		def random_hyperbolic_parabolloid():
+			posit1 = random.randint(0, 2)
+			posit2 = random.choice([i for i in range(2) if i != posit1])
+
+			seconds = Matrix.Matrix.generate_matrix_with_eigenvalues([
+				rand_pos_sq_winv() if (i != posit1 and i != posit2) 
+				else (rand_neg_sq_winv() if i != posit2 else 0)
+				for i in range(3) 
+			])
+			firsts = Matrix.Vector.from_list([
+				0 if i != posit2 else rand_neg() 
+				for i in range(3)
+			])
+			free = rand_nzero()
+
+			return seconds, free, firsts
+
+		def random_hyperboloid():
+			posit = random.randint(0, 2)
+
+			seconds = Matrix.Matrix.generate_matrix_with_eigenvalues([
+				rand_pos_sq_winv() if i != posit else rand_neg_sq_winv()
+				for i in range(3) 
+			])
+			free = rand_nzero()
+
+			return seconds, free, None
+
+		def random_intersecting_plane():
+			posit1 = random.randint(0, 2)
+			posit2 = random.choice([i for i in range(2) if i != posit1])
+
+			seconds = Matrix.Matrix.generate_matrix_with_eigenvalues([
+				rand_pos_sq_winv() if (i != posit1 and i != posit2) 
+				else (rand_nzero_sq_winv() if i != posit2 else 0)
+				for i in range(3) 
+			])
+			free = 0
+
+			return seconds, free, None
+
+		options = [
+			random_spherical,
+			random_elliptical,
+			random_cone,
+			random_elliptic_cylindrical,
+			random_elliptic_parabolloid,
+			random_hyperbolic_cylindrical,
+			random_hyperbolic_parabolloid,
+			random_hyperboloid,
+			random_intersecting_plane
+		]
+		option = random.choice(options)
+
+		seconds, free, firsts = option()
+	
+		if not firsts:
+			firsts = Matrix.Vector.from_list([0 for i in range(3)])
+
+		if debug:
+			return SecondOrder(3, seconds, firsts, free), option, options
 
 		return SecondOrder(3, seconds, firsts, free)
 
 
 	def to_expr(self):
-		left = Matrix.Matrix.from_vector(self.variables, False)
+
+		variables = self.transl_matrix * self.variables
+
+		left = Matrix.Matrix.from_vector(variables, False)
 		simple = sympy.nsimplify(
 				sympy.expand(
-					(left * self.seconds * self.variables).to_list()[0] 
-					+ self.firsts * self.variables 
+					(left * self.seconds * variables).to_list()[0] 
+					+ self.firsts * variables 
 					+ self.free
 				)
 			)
@@ -182,12 +358,20 @@ if __name__ == "__main__":
 
 	# for i in range(30):
 	# 	s.append(SecondOrderCurves.generate_hyperbola(*func()))
-		
+	
+	mtx = Matrix.Matrix.generate_random_det1_matrix(size=3, max_steps=2, max_iters=1)
+	print(mtx)
+
 	for i in range(30):
-		# s.append(SecondOrder.generate_random(3))
+		obj1, opt1, opts1 = SecondOrder.generate_random_3d_canonicasable(debug=True, with_inv=False)
+		obj2, opt2, opts2 = SecondOrder.generate_random_3d_canonicasable(debug=True, with_inv=False)
+		obj1.transl_matrix = mtx
+		s.append((obj1, opt1))
+		s.append((obj2, opt2))
 		# s.append(SecondOrderCurves.generate_parabola( *(list(func())[1:]) ))
-		s.append(SecondOrderCurves.generate_hyperbola( *(list(func())) ))
+		# s.append(SecondOrderCurves.generate_hyperbola( *(list(func())) ))
 
 	random.shuffle(s)
 	for i in s:
-		print(f"\\item \\( {str(i)} = 0 \\);")
+		print(str(i[0]) + " = 0", str(i[1]))
+		# print(f"\\item \\( {str(i)} = 0 \\);")

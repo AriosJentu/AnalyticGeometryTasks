@@ -315,15 +315,18 @@ class Matrix:
 		cached_row = -1
 		cached_values = Stack(max_multiplicator+1)
 
+		steps = 0
+
 		#Basic preparing with sizes
 		for row_from in range(size):
 			for row_to in range(size):
 				if row_from != row_to and row_to != cached_row:
-					if randint(0, 1):
+					if steps < max_steps and randint(0, 1):
 						identity.make_random_multiplier_row_addition(
 							row_from, row_to, cached_values, 
 							all_multiplicators, minimize
 						)
+						steps += 1
 					else:
 						identity.swap_rows(row_from, row_to)
 
@@ -331,15 +334,14 @@ class Matrix:
 
 		#Making operations randomly
 		if no_zeros:
-			step = 0
-			while identity.zeros_count() > 0 and step < max_steps:
+			while identity.zeros_count() > 0 and steps < max_steps:
 				identity.make_random_operations(
 					1, rows, cached_row, cached_values, 
 					all_multiplicators, minimize
 				)
-				step += 1
+				steps += 1
 		else:
-			iters = randint(min_iters, max_iters)
+			iters = min(randint(min_iters, max_iters), max_steps-steps)
 			identity.make_random_operations(
 				iters, rows, cached_row, cached_values, 
 				all_multiplicators, minimize
