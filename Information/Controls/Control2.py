@@ -54,7 +54,7 @@ def tasks_updater(text):
 	))
 
 	text = text.replace("#SECONDS1#", f"\\[ {get_random()} = 0 \\]")
-	text = text.replace("#SECONDS2#", f"\\[ {Second.SecondOrder.generate_random(3, 2)} = 0 \\]")
+	text = text.replace("#SECONDS2#", f"\\[ {Second.SecondOrder.generate_random_3d_canonicasable()} = 0 \\]")
 
 	return text
 

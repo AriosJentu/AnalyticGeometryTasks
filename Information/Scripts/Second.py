@@ -61,6 +61,23 @@ class SecondOrder:
 		return SecondOrder(dimension, seconds, firsts, free)
 
 
+	@staticmethod
+	def generate_random_3d_canonicasable(maxval: int = 7):
+
+		def rand_nzero():
+			return random.randint(-maxval, -1) if random.randint(0, 1) == 0 else random.randint(1, maxval)
+
+		a, b, c = (rand_nzero() for i in range(3))
+		f, g, h = (random.randint(-maxval, maxval) for i in range(3))
+		p, q, r = (2*random.randint(-maxval, maxval) for i in range(3))
+
+		seconds = Matrix.Matrix.from_list_of_lists([[a, h, g], [h, b, f], [g, f, c]])
+		firsts = Matrix.Vector.from_list([p, q, r])
+		free = rand_nzero()
+
+		return SecondOrder(3, seconds, firsts, free)
+
+
 	def to_expr(self):
 		left = Matrix.Matrix.from_vector(self.variables, False)
 		simple = sympy.nsimplify(
