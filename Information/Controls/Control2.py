@@ -5,6 +5,7 @@ import Modules.Imports as Imports
 
 from ..Scripts import Lines
 from ..Scripts import Second
+from ..Scripts import Matrix
 from ..Scripts import TextReplacer
 
 control_event = "Контрольная работа"
@@ -22,7 +23,7 @@ def parameters():
 
 	return rad1, rad2, (pt1, pt2)
 
-def get_random():
+def get_random_curve():
 	curves = [
 		Second.SecondOrderCurves.generate_ellipse( *(list(parameters())), True),
 		Second.SecondOrderCurves.generate_hyperbola( *(list(parameters())), True),
@@ -39,9 +40,38 @@ def get_random():
 	vals = [i[0] for i in curves if i != 0]
 
 	if len(vals) <= 1:
-		return get_random()
+		return get_random_curve()
 	else:
 		return random.choice(vals)
+
+def get_random_surface():
+
+	mtx = Matrix.Matrix.generate_random_det1_matrix(size=3, max_steps=2, max_iters=1)
+
+	obj = Second.SecondOrder.generate_random_3d_canonicasable()
+	obj.transl_matrix = mtx
+
+	s = str(obj)
+	strs = s\
+		.replace("-", "+")\
+		.replace("=", "+")\
+		.replace("}{", "+")\
+		.replace("^{2}", "")\
+		.replace("\\frac", "")\
+		.replace("{", "")\
+		.replace("}", "")\
+		.replace("x", "")\
+		.replace("y", "")\
+		.replace("z", "")\
+		.replace(" ", "")\
+		.split("+")
+	print(strs)
+	lst = [len(i) for i in strs]
+
+	if max(lst) > 2:
+		return get_random_surface()
+	else:
+		return s
 
 
 def tasks_updater(text):
@@ -53,8 +83,8 @@ def tasks_updater(text):
 		Lines.generate_point_name()
 	))
 
-	text = text.replace("#SECONDS1#", f"\\[ {get_random()} = 0 \\]")
-	text = text.replace("#SECONDS2#", f"\\[ {Second.SecondOrder.generate_random_3d_canonicasable()} = 0 \\]")
+	text = text.replace("#SECONDS1#", f"\\[ {get_random_curve()} = 0 \\]")
+	text = text.replace("#SECONDS2#", f"\\[ {get_random_surface()} = 0 \\]")
 
 	return text
 
