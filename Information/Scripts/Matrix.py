@@ -77,26 +77,39 @@ class Vector:
 
 		return sums
 
+	def cross_product(self, vector: "Vector") -> "Vector":
+		if not self.__check_size__(vector) and self.size != 3:
+			return
+
+		deft = Vector.from_list([0, 0, 0])
+		mtx = Matrix.from_list_of_vectors([deft, self, vector])
+
+		parts = []
+		for i in range(3):
+			det = mtx.get_matrix_minor(0, i).determinant()
+			parts.append(det * (-1)**i)
+
+		return Vector.from_list(parts)
+
+
 	def to_list(self):
 		return self.vector
 
-	def to_latex(self) -> str:
+	def to_latex(self, floats: bool = False) -> str:
 		return """\\begin{{pmatrix}}
 			{vector}
 		\\end{{pmatrix}}""".format(
 			vector = ' \\\\\n\t\t\t'.join([
-				self.value_to_latex(i) for i in self.vector
+				self.value_to_latex(i, floats) for i in self.vector
 			])
 		)
 
-	def to_latex_floats(self) -> str:
-		return """\\begin{{pmatrix}}
-			{vector}
-		\\end{{pmatrix}}""".format(
-			vector = ' \\\\\n\t\t\t'.join([
-				self.value_to_latex(i, True) for i in self.vector
-			])
-		)
+	def to_latex_row(self, floats: bool = False) -> str:
+		return "\\left\\lbrace {vector} \\right\\rbrace".format(
+				vector = ', '.join([
+					self.value_to_latex(i, floats) for i in self.vector
+				])
+			)
 
 	def distance(self) -> float:
 		return sum([v*v for v in self.vector])**(1/2)
@@ -502,22 +515,26 @@ class Matrix:
 
 		result = 0
 		for index in range(size):
-			submatrix = Matrix.from_list_of_lists(
-				[ 
-					[
-						self.matrix[row][column] 
-						for column in range(size)
-						if column != index
-					] 
-					for row in range(size) 
-					if row != 0
-				]
-			)
-
+			submatrix = self.get_matrix_minor(0, index)
 			det2 = submatrix.determinant()
 			result += (-1)**index * det2 * self.matrix[0][index]
 
 		return result
+
+
+	def get_matrix_minor(self, row: int = 0, column: int = 0) -> "Matrix":
+		return Matrix.from_list_of_lists(
+			[ 
+				[
+					self.matrix[mrow][mcolumn] 
+					for mcolumn in range(self.columns)
+					if mcolumn != column
+				] 
+				for mrow in range(self.rows) 
+				if mrow != row
+			]
+		)
+
 
 	def row_addition(self, 
 		from_row: int = 0, to_row: int = 1, multiplier: int = 1
@@ -861,3 +878,7 @@ if __name__ == "__main__":
 
 	s = Vector.from_list(["x", "y", "z"])
 	print(s.to_latex())
+
+	a = Vector.from_list([3, 4, -1])
+	b = Vector.from_list([5, 1, -2])
+	print(a.cross_product(b).to_latex_row())
