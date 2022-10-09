@@ -65,8 +65,9 @@ def get_random_surface():
 		.replace("z", "")\
 		.replace(" ", "")\
 		.split("+")
-	print(strs)
-	lst = [len(i) for i in strs]
+
+	lst = [len(i) for i in strs if i != ""]
+	print([i for i in strs if i != ""])
 
 	if max(lst) > 2:
 		return get_random_surface()
@@ -84,7 +85,9 @@ def tasks_updater(text):
 	))
 
 	text = text.replace("#SECONDS1#", f"\\[ {get_random_curve()} = 0 \\]")
-	text = text.replace("#SECONDS2#", f"\\[ {get_random_surface()} = 0 \\]")
+	
+	if "#SECONDS2#" in text:
+		text = text.replace("#SECONDS2#", f"\\[ {get_random_surface()} = 0 \\]")
 
 	return text
 
