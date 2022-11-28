@@ -266,6 +266,9 @@ class SecondOrder:
 
 		return simple
 
+	def get_maximal_denominator(self):
+		return self.to_expr().as_numer_denom()[1]
+
 	def to_str(self):
 		return str(sympy.latex(self.to_expr()))
 
@@ -280,8 +283,15 @@ class SecondOrderCurves(SecondOrder):
 	def __init__(self, seconds: Matrix.Matrix, firsts: Matrix.Vector, free: float):
 		super().__init__(2, seconds, firsts, free)
 
+	def set_rotation_translation_matrix(self, angle=sympy.pi):
+		self.transl_matrix = Matrix.Matrix.from_list_of_lists([
+			[sympy.cos(angle), sympy.sin(angle)],
+			[-sympy.sin(angle), sympy.cos(angle)]
+		])
+
+
 	@staticmethod
-	def generate_ellipse(horizontal: float, vertical: float, centered: tuple[float, float], debug: bool = False):
+	def generate_ellipse(horizontal: float, vertical: float, centered: tuple[float, float], debug: bool = False, imaginary: bool = False):
 		a = horizontal
 		b = vertical
 		c, d = centered
@@ -290,13 +300,22 @@ class SecondOrderCurves(SecondOrder):
 		vec = Matrix.Vector.from_list([-2*c/a**2, -2*d/b**2])
 		free = c**2/a**2 + d**2/b**2 - 1
 
+		if imaginary:
+			free = free + 2
+
 		if not debug:
 			return SecondOrderCurves(mtx, vec, free)
 
 		return SecondOrderCurves(mtx, vec, free), sympy.nsimplify(abs(free))
 
+
 	@staticmethod
-	def generate_hyperbola(horizontal: float, vertical: float, centered: tuple[float, float], debug: bool = False):
+	def generate_imaginary_ellipse(horizontal: float, vertical: float, centered: tuple[float, float], debug: bool = False):
+		return SecondOrderCurves.generate_ellipse(horizontal, vertical, centered, debug, imaginary=True)
+
+
+	@staticmethod
+	def generate_hyperbola(horizontal: float, vertical: float, centered: tuple[float, float], debug: bool = False, imaginary: bool = False):
 		a = horizontal
 		b = vertical
 		c, d = centered
@@ -305,10 +324,14 @@ class SecondOrderCurves(SecondOrder):
 		vec = Matrix.Vector.from_list([-2*c/a**2, 2*d/b**2])
 		free = c**2/a**2 - d**2/b**2 - 1
 
+		if imaginary:
+			free = -free
+
 		if not debug:
 			return SecondOrderCurves(mtx, vec, free)
 
 		return SecondOrderCurves(mtx, vec, free), sympy.nsimplify(abs(free))
+
 
 	@staticmethod
 	def generate_parabola(parameter: float, centered: tuple[float, float], debug: bool = False):
@@ -323,6 +346,55 @@ class SecondOrderCurves(SecondOrder):
 			return SecondOrderCurves(mtx, vec, free)
 
 		return SecondOrderCurves(mtx, vec, free), sympy.nsimplify(abs(free))
+
+	@staticmethod
+	def generate_cross_lines(horizontal: float, vertical: float, centered: tuple[float, float], debug: bool = False, imaginary: bool = False):
+		a = horizontal
+		b = vertical
+		c, d = centered
+
+		if imaginary:
+			mtx = Matrix.Matrix.from_list_of_lists([[1/a**2, 0], [0, 1/b**2]])
+			vec = Matrix.Vector.from_list([-2*c/a**2, -2*d/b**2])
+			free = c**2/a**2 + d**2/b**2
+		
+		else:
+			mtx = Matrix.Matrix.from_list_of_lists([[1/a**2, 0], [0, -1/b**2]])
+			vec = Matrix.Vector.from_list([-2*c/a**2, 2*d/b**2])
+			free = c**2/a**2 - d**2/b**2
+
+		if not debug:
+			return SecondOrderCurves(mtx, vec, free)
+
+		return SecondOrderCurves(mtx, vec, free), sympy.nsimplify(abs(free))
+
+	@staticmethod
+	def generate_imaginary_cross_lines(horizontal: float, vertical: float, centered: tuple[float, float], debug: bool = False):
+		return SecondOrderCurves.generate_cross_lines(horizontal, vertical, centered, debug, imaginary=True)
+
+
+	@staticmethod
+	def generate_parallel_lines(distance: float, centered: tuple[float, float], debug: bool = False, imaginary: bool = False):
+		a = distance
+		c, d = centered
+
+		mtx = Matrix.Matrix.from_list_of_lists([[1/a**2, 0], [0, 0]])
+		vec = Matrix.Vector.from_list([0, 0])
+		free = -1
+
+		if imaginary:
+			free = -free
+
+		if not debug:
+			return SecondOrderCurves(mtx, vec, free)
+
+		return SecondOrderCurves(mtx, vec, free), sympy.nsimplify(abs(free))
+
+
+	@staticmethod
+	def generate_imaginary_parallel_lines(distance: float, centered: tuple[float, float], debug: bool = False):
+		return SecondOrderCurves.generate_parallel_lines(distance, centered, debug, imaginary=True)
+
 
 if __name__ == "__main__":
 
@@ -360,7 +432,6 @@ if __name__ == "__main__":
 	# 	s.append(SecondOrderCurves.generate_hyperbola(*func()))
 	
 	mtx = Matrix.Matrix.generate_random_det1_matrix(size=3, max_steps=2, max_iters=1)
-	print(mtx)
 
 	for i in range(30):
 		obj1, opt1, opts1 = SecondOrder.generate_random_3d_canonicasable(debug=True, with_inv=False)
@@ -373,5 +444,64 @@ if __name__ == "__main__":
 
 	random.shuffle(s)
 	for i in s:
-		print(str(i[0]) + " = 0", str(i[1]))
+		pass
+		# print(str(i[0]) + " = 0", str(i[1]))
 		# print(f"\\item \\( {str(i)} = 0 \\);")
+
+	lists = []
+	answs = []
+	figures = []
+
+	i = 0
+	while i < 10:
+	# for i in range(50):
+		r1, r2, pt = func()
+		pt1, pt2 = pt
+		chses = {
+			"Эллипс": [SecondOrderCurves.generate_ellipse(r1, r2, pt, debug=True), "\\item \\( \\displaystyle {figure} = 0 \\);", "\\item {name}, Полуоси: \\({r1}, {r2}\\), Центр: \\( ({pt1}, {pt2}) \\), Угол: \\(\\displaystyle {angle}\\);"],
+			"Парабола": [SecondOrderCurves.generate_parabola(r1, pt, debug=True), "\\item \\( \\displaystyle {figure} = 0 \\);", "\\item {name}, Параметр: \\({r1}\\), Центр: \\( ({pt1}, {pt2}) \\), Угол: \\(\\displaystyle {angle}\\);"],
+			"Гипербола": [SecondOrderCurves.generate_hyperbola(r1, r2, pt, debug=True), "\\item \\( \\displaystyle {figure} = 0 \\);", "\\item {name}, Полуоси: \\( {r1}, {r2} \\), Центр: \\( ({pt1}, {pt2}) \\), Угол: \\(\\displaystyle {angle}\\);"],
+			"Мнимый эллипс": [SecondOrderCurves.generate_imaginary_ellipse(r1, r2, pt, debug=True), "\\item \\( \\displaystyle {figure} = 0 \\);", "\\item {name}, Полуоси: \\( {r1}, {r2} \\), Центр: \\( ({pt1}, {pt2}) \\), Угол: \\(\\displaystyle {angle}\\);"],
+			"Пересекающиеся прямые": [SecondOrderCurves.generate_cross_lines(r1, r2, pt, debug=True), "\\item \\( \\displaystyle {figure} = 0 \\);", "\\item {name}, Направляющие: \\({r1}, {r2}\\), Центр: \\( ({pt1}, {pt2}) \\), Угол: \\(\\displaystyle {angle}\\);"],
+			"Мнимые пересекающиеся прямые": [SecondOrderCurves.generate_imaginary_cross_lines(r1, r2, pt, debug=True), "\\item \\( \\displaystyle {figure} = 0 \\);", "\\item {name}, Направляющие: \\({r1}, {r2}\\), Центр: \\( ({pt1}, {pt2}) \\), Угол: \\(\\displaystyle {angle}\\);"],
+			"Параллельные прямые": [SecondOrderCurves.generate_parallel_lines(r1, pt, debug=True), "\\item \\( \\displaystyle {figure} = 0 \\);", "\\item {name}, Расстояние: \\({r1}\\), Центр: \\( ({pt1}, {pt2}) \\), Угол: \\(\\displaystyle {angle}\\);"],
+			"Мнимые параллельные прямые": [SecondOrderCurves.generate_imaginary_parallel_lines(r1, pt, debug=True), "\\item \\( \\displaystyle {figure} = 0 \\);", "\\item {name}, Расстояние: \\({r1}\\), Центр: \\( ({pt1}, {pt2}) \\), Угол: \\(\\displaystyle {angle}\\);"],
+		}
+
+		angles = [0, 0, 0, 0, sympy.pi/6, sympy.pi/4, sympy.pi/3, sympy.pi/2, sympy.pi*5/6, sympy.pi*2/3, sympy.pi*3/4]
+		sign = random.choice([1, -1, -1, 1, 1, -1, -1, 1])
+		angle = random.choice(angles)
+
+		chs = random.choice(list(chses.keys()))
+		figr, curve = chses[chs][0]
+		figr.set_rotation_translation_matrix(angle)
+		fig = chses[chs][1]
+		ans = chses[chs][2]
+		# print(figr, curve, type(curve))
+
+		if figr.get_maximal_denominator() > 128:
+			continue
+
+		i += 1
+
+		figures.append(figr)
+		lists.append(fig.format(figure=str(figr)))
+		answs.append(ans.format(name=chs, r1=r1, r2=r2, pt1=pt1, pt2=pt2, angle=sympy.latex(angle)))
+
+		# print(fig.format(figure="kek", name="kek", r1=r1, r2=r2, pt1=pt1, pt2=pt2))
+		# print(fig.format(figure=str(chses[chs][0]), name=chs, r1=r1, r2=r2, pt1=pt1, pt2=pt2))
+	
+	# print("\\begin{enumerate}")
+	# for i in figures:
+	# 	print("\t"+str(i.get_maximal_denominator()))
+	# print("\\end{enumerate}")
+
+	print("\\begin{enumerate}")
+	for i in lists:
+		print("\t"+str(i))
+	print("\\end{enumerate}")
+
+	print("\\begin{enumerate}")
+	for i in answs:
+		print("\t"+str(i))
+	print("\\end{enumerate}")
