@@ -30,6 +30,10 @@ def parameters():
 
 	return rad1, rad2, (pt1, pt2)
 
+DEFAULT_TYPE = 0
+DIAG_TYPE = 1
+INV_DIAG_TYPE = 2
+
 def generate_random_additions_matrix():
 	a = random.choice([i for i in range(-5, 6) if i != 0])
 	b = random.choice([i for i in range(-5, 6) if i != 0])
@@ -37,17 +41,22 @@ def generate_random_additions_matrix():
 	chs = random.randint(0, 3)
 
 	if chs == 0:
-		return Matrix.Matrix.from_list_of_lists([[a*char_lambda, 0], [0, b*char_lambda]])
+		return Matrix.Matrix.from_list_of_lists([[a*char_lambda, 0], [0, b*char_lambda]]), DIAG_TYPE
 	elif chs == 1:
-		return Matrix.Matrix.from_list_of_lists([[0, a*char_lambda], [0, b*char_lambda]])
+		return Matrix.Matrix.from_list_of_lists([[0, a*char_lambda], [0, b*char_lambda]]), DEFAULT_TYPE
 	elif chs == 2:
-		return Matrix.Matrix.from_list_of_lists([[a*char_lambda, 0], [b*char_lambda, 0]])
+		return Matrix.Matrix.from_list_of_lists([[a*char_lambda, 0], [b*char_lambda, 0]]), DEFAULT_TYPE
 	elif chs == 3:
-		return Matrix.Matrix.from_list_of_lists([[0, a*char_lambda], [b*char_lambda, 0]])
+		return Matrix.Matrix.from_list_of_lists([[0, a*char_lambda], [b*char_lambda, 0]]), INV_DIAG_TYPE
 
-def generate_random_additions_vector():
+def generate_random_additions_vector(diag_type):
 	a = random.choice([i for i in range(-5, 6) if i != 0])
 	chs = random.randint(0, 1)
+
+	if diag_type == DIAG_TYPE:
+		chs = 1
+	elif diag_type == INV_DIAG_TYPE:
+		chs = 0
 
 	if chs:
 		return Matrix.Vector.from_list([a*char_lambda, 0])
@@ -100,8 +109,8 @@ def get_random_curve(with_parameter: bool = False):
 				"Пересекающиеся прямые",
 			]
 
-			right_matrix = generate_random_additions_matrix()
-			right_vector = generate_random_additions_vector()
+			right_matrix, diag_type = generate_random_additions_matrix()
+			right_vector = generate_random_additions_vector(diag_type)
 
 		choises = {
 			"Эллипс": [
@@ -180,7 +189,8 @@ def get_random_surface(random_matrix: bool = True):
 	obj = Second.SecondOrder.generate_random_3d_canonicasable()
 
 	if random_matrix:
-		mtx = Matrix.Matrix.generate_random_det1_matrix(size=3, max_steps=2, max_iters=1)
+		# mtx = Matrix.Matrix.generate_random_det1_matrix(size=3, max_steps=2, max_iters=1)
+		mtx = Matrix.Matrix.generate_random_permutation_matrix(size=3)
 		obj.transl_matrix = mtx
 
 	s = str(obj)
@@ -201,7 +211,7 @@ def get_random_surface(random_matrix: bool = True):
 	lst = [len(i) for i in strs if i != ""]
 	# print([i for i in strs if i != ""])
 
-	if max(lst) > 2:
+	if len(lst) == 0 or max(lst) > 2:
 		return get_random_surface(random_matrix)
 	else:
 		return s
@@ -281,9 +291,9 @@ for task in tasks:
 
 exercises = []
 for index, taskinfo in enumerate(tasksinfo):
-	exercise = Imports.Excercises.Excercise(taskinfo)
+	exercise = Imports.Exercises.Exercise(taskinfo)
 	if index == len(tasksinfo) - 1:
-		exercise = Imports.Excercises.Excercise(taskinfo, title="Теоретический вопрос")
+		exercise = Imports.Exercises.Exercise(taskinfo, title="Теоретический вопрос")
 
 	exercises.append(exercise)
 

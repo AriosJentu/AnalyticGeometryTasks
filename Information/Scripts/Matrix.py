@@ -402,6 +402,7 @@ class Matrix:
 		identity = Matrix.generate_diagonal_matrix(1, size)
 
 		rows = list(range(size))
+		cached_row = []
 		for i in range(randint(1, size+1)):
 			cached_row = identity.make_random_row_permutation(
 				rows, cached_row

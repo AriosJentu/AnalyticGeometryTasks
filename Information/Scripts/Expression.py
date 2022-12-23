@@ -276,6 +276,7 @@ def main(*args):
 	var2 = Variable("x")
 	var3 = Variable("y")
 	print(var1*coef2)
+	print(var1+var3)
 	print(isinstance(var2, LinearExpression))
 
 	linexp = LinearExpression()

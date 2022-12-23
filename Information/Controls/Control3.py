@@ -84,9 +84,9 @@ for task in tasks:
 
 exercises = []
 for index, taskinfo in enumerate(tasksinfo):
-	exercise = Imports.Excercises.Excercise(taskinfo)
+	exercise = Imports.Exercises.Exercise(taskinfo)
 	if index == len(tasksinfo) - 1:
-		exercise = Imports.Excercises.Excercise(taskinfo, title="Теоретический вопрос")
+		exercise = Imports.Exercises.Exercise(taskinfo, title="Теоретический вопрос")
 
 	exercises.append(exercise)
 

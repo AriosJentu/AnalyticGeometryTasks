@@ -761,7 +761,7 @@ def main(*args):
 	line = Line(2)
 	line.generate_random_line_points()
 	# print(line.to_points_form())
-	# print(line.to_canonical_form())
+	print(line.to_canonical_form())
 	# print(line.to_parametric_form())
 	# print(line.to_random_form())
 

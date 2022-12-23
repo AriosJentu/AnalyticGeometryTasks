@@ -60,7 +60,7 @@ for task in tasks:
 
 exercises = []
 for taskinfo in tasksinfo:
-	exercise = Imports.Excercises.Excercise(taskinfo)
+	exercise = Imports.Exercises.Exercise(taskinfo)
 	exercises.append(exercise)
 
 class Comission(Imports.Assignments.Assignment):
