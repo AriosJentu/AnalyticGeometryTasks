@@ -1,0 +1,188 @@
+\documentclass[fleqn]{extarticle}
+\usepackage[russian]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{mathtools}
+
+\textwidth 18cm
+\textheight 25cm
+\oddsidemargin -1cm
+\evensidemargin -1cm
+\topmargin -3cm
+\pdfpageheight 297mm
+
+\newcommand{\abs}[1]{ \left\vert #1 \right\vert }
+\newcommand{\norm}[1]{ \left\Vert #1 \right\Vert }
+\newcommand{\pares}[1]{ \left( #1 \right) }
+\newcommand{\bracs}[1]{ \left\lbrace #1 \right\rbrace }
+
+\newcommand{\ue}{\underline{e}}
+\newcommand{\uv}{\underline{v}}
+\newcommand{\uI}{\underline{I}}
+\newcommand{\pq}[1]{\prescript{#1}{}{q}}
+
+\title{Кватернионы. Лекционный материал.\\Аналитическая геометрия}
+\author{AriosJentu}
+\date{}
+
+\begin{document}
+
+	\maketitle
+	
+	\section{Лекция 1}
+
+		Рассмотрим три поля комплексных чисел $\mathbb{C}_{i}$, $\mathbb{C}_{j}$, $\mathbb{C}_{k}$, такие, что для каждого из них выполняется условие:
+		\[ i^2 = j^2 = k^2 = -1. \]
+		На основе этих полей можно построить три двумерных пространства с базисными векторами $\pares{\ue_1, \ue_i}$, $\pares{\ue_1, \ue_j}$ и $\pares{\ue_1, \ue_k}$ соответствено.
+		Теперь построим четырехмерное пространство $\mathbb{\underline{H}}$ из этих пространств, для которых вещественная часть является общей. 
+		Введем в систему базисные вектора. 
+		
+		Положим, что единичный базисный вектор $\ue_1$, отвечающий за вещественную часть в этих пространствах, является общим в новом пространстве. 
+		Соединим три пространства в одно вдоль вектора $\ue_1$. Единичные базисные вектора $\ue_i, ~ \ue_j, ~ \ue_k$, ортогональные $\ue_1$, 
+		построим ортогональными между собой, причем тройка $\ue_i, ~ \ue_j, ~ \ue_k$ является правой в трехмерном пространстве, 
+		образованным исключением из данного пространства вектора $\ue_1$.
+
+		Тогда вектор $\underline{q}$ с вещественными координатами $(q_1, q_i, q_j, q_k)$ в этом пространстве можно представить в следующем виде:
+		\[ \underline{q} = q_1 \ue_1 + q_i \ue_i + q_j \ue_j + q_k \ue_k. \]
+
+		\subsection{<<Особое>> векторное произведение в 4D}
+			Из условий того, что тройка $\ue_i, ~ \ue_j, ~ \ue_k$ правая, то:
+			\[ \ue_i \times \ue_j = \ue_k, ~ \ue_j \times \ue_k = \ue_i, ~ \ue_k \times \ue_i = \ue_j. \]
+			По свойствам векторного произведения -- при изменении порядка произведения, изменяется направление результирующего вектора:
+			\[ \ue_j \times \ue_i = - \ue_k, ~ \ue_k \times \ue_j = - \ue_i, ~ \ue_i \times \ue_k = - \ue_j. \]
+			В дополнение положим, что умножение любого вектора из тройки $\ue_i, ~ \ue_j, ~ \ue_k$ на вектор $\ue_1$ дает в результате этот же вектор вне зависимости от порядка перемножения:
+			\[ \ue_i \times \ue_1 = \ue_1 \times \ue_i = \ue_i, ~ \ue_j \times \ue_1 = \ue_1 \times \ue_j = \ue_j, ~ \ue_k \times \ue_1 = \ue_1 \times \ue_k = \ue_k. \]
+			Из условий $i^2 = j^2 = k^2 = -1$ определим векторное произведение базисных векторов следующим образом:
+			\[ \ue_i \times \ue_i = \ue_j \times \ue_j = \ue_k \times \ue_k = - \ue_1. \]
+			Тогда тройное векторное произведение тройки базисных векторов можно определить следующим образом: 
+			\[ \ue_i \times \ue_j \times \ue_k = \ue_k \times \ue_k = - \ue_1. \]
+
+		\subsection{Определение кватерниона}
+
+			На основе этих базисных векторов построим поле кватернионов $\mathbb{H}$. 
+			Положим $\ue_1 = 1, ~ \ue_i = i, ~ \ue_j = j, ~ \ue_k = k$, 
+			и пусть выполняются следующие условия:
+			\[ p \cdot q = \ue_p \times \ue_q, \quad p, q \in \bracs{1, i, j, k}. \]
+			Тогда вектору $\underline{q}$ из четырехмерного пространства $\mathbb{\underline{H}}$ будет соответствовать число $q$ из поля кватернионов $\mathbb{H}$ такое, что:
+			\[ q = q_1 + q_i \cdot i + q_j \cdot j + q_k \cdot k, \quad q_1, q_i, q_j, q_k \in \mathbb{R}. \]
+
+			\textbf{Def:} Полем кватернионов $\mathbb{H}$ будем называть поле чисел $q$ над четырехмерным векторным пространством $\mathbb{\underline{H}}$, содержащих три мнимые единицы $i, j, k$ такие, что:
+			\[ i^2 = j^2 = k^2 = ijk = -1. \]
+
+			\textbf{Props:} Из свойств векторного пространства и введенного четырехмерного векторного произведения следует:
+			\begin{enumerate}
+				\item Над полем кватернионов определены линейные операции: сложение, вычитание, умножение на вещественное число:
+				\[ \lambda_1 \cdot \pq{1} + \lambda_2 \cdot \pq{2}, ~ \lambda_{1, 2} \in \mathbb{R}; \]
+				\item Произведение чисел $i, j, k$ некоммутативно ($ij = k$, $ji = -k$);
+				\item Произведение кватернионов некоммутативно:
+				\[ \pq{1} \cdot \pq{2} \neq \pq{2} \cdot \pq{1}; \]
+				\item Произведение кватернионов дистрибутивно относительно сложения:
+				\[ \pares{\pq{1} + \pq{2}} \cdot \prescript{3}{}{q} = \pq{1} \cdot \prescript{3}{}{q} + \pq{2} \cdot \prescript{3}{}{q}; \]
+				\item Произведение кватернионов дистрибутивно относительно произведения на вещественное число:
+				\[ \lambda \cdot \pares{\pq{1} \cdot \pq{2}} = \pares{\lambda \cdot \pq{1}} \cdot \pq{2} = \pq{1} \cdot \pares{\lambda \cdot \pq{2}}; \]
+				\item Произведение кватернионов ассоциативно:
+				\[ \pq{1} \cdot \pares{\pq{2} \cdot \prescript{3}{}{q}} = \pares{\pq{1} \cdot \pq{2}} \cdot \prescript{3}{}{q}. \]
+			\end{enumerate}
+
+			Так же кватернионы можно рассматривать в векторной форме. Введем вектора $\uI = (i, j, k)$ и $\underline{q}_I = \pares{q_i, q_j, q_k}$. Тогда:
+			\[ q = q_1 + \underline{q}_I \cdot \uI, \]
+			или, раскладывая на скалярную и векторную части в пространстве $\underline{H}$:
+			\[ q = \pares{q_1, \underline{q}_I}. \]
+			Здесь $q_1$ -- скалярная часть, а $\underline{q}_I$ -- векторная часть кватерниона.
+
+		\subsection{Произведение кватернионов}
+			Рассмотрим два кватерниона:
+			\[ \pq{1} = a_1 + b_1 i + c_1 j + d_1 k, ~ \pq{2} = a_2 + b_2 i + c_2 j + d_2 k. \]
+			Для них положим соответствующие векторные части: $\uv_1 = \pares{b_1, c_1, d_1}, ~ \uv_2 = \pares{b_2, c_2, d_2}$
+			Построим кватернион, полученный произведением этих двух кватернионов:
+			\[ \begin{split} 
+				&\pares{a_1 + b_1 i + c_1 j + d_1 k} \cdot \pares{a_2 + b_2 i + c_2 j + d_2 k} = \\
+				= ~ & a_1 a_2   + b_1 a_2 i   + c_1 a_2 j   + d_1 a_2 k   + \\ 
+				+ & a_1 b_2 i + b_1 b_2 i^2 + c_1 b_2 ji  + d_1 b_2 ki  + \\
+				+ & a_1 c_2 j + b_1 c_2 ij  + c_1 c_2 j^2 + d_1 c_2 kj  + \\
+				+ & a_1 d_2 k + b_1 d_2 ik  + c_1 d_2 jk  + d_1 d_2 k^2 = \\
+				= ~ & \pares{a_1 a_2 - b_1 b_2 - c_1 c_2 - d_1 d_2} + \\
+				+ & \pares{a_1 b_2 + b_1 a_2 + c_1 d_2 - d_1 c_2} \cdot i + \\
+				+ & \pares{a_1 c_2 + c_1 a_2 + d_1 b_2 - b_1 d_2} \cdot j + \\
+				+ & \pares{a_1 d_2 + d_1 a_2 + b_1 c_2 - c_1 b_2} \cdot k = \\
+			\end{split} \]
+			\[ = a_1 a_2 - \uv_1 \cdot \uv_2 + a_1 \pares{\uv_2 \cdot \uI} + a_2 \pares{\uv_1 \cdot \uI} + \pares{\uv_1 \times \uv_2} \cdot \uI. \]
+			\[ = \pares{a_1 a_2 - \uv_1 \cdot \uv_2} + \pares{a_1 \uv_2 + a_2 \uv_1 + \uv_1 \times \uv_2} \cdot \uI. \]
+
+	\section{Лекция 2}
+
+		\subsection{Сопряжение кватерниона}
+			Рассмотрим кватернион:
+			\[ q = q_1 + \uv \cdot \uI, ~ \uv = \underline{q}_I \]
+			Сопряженным кватернионом будет называться кватернион следующего вида:
+			\[ q^{*} = q_1 - \uv \cdot \uI. \]
+			Свойства:
+			\begin{enumerate}
+				\item Двойное сопряжение: $\pares{q^{*}}^{*} = q$;
+				\item Сопряжение линейной комбинации: 
+				\[ \pares{\lambda_1 \pq{1} + \lambda_2 \pq{2}}^{*} = \lambda_1 \pq{1}^{*} + \lambda_2 \pq{2}^{*}; \]
+				\item Сопряжение произведения: 
+				\[ \pares{\pq{1} \cdot \pq{2}}^{*} = \pq{2}^{*} \cdot \pq{1}^{*}; \]
+				\item Произведение кватерниона на сопряженный: 
+				\[ q \cdot q^{*} = q^{*} \cdot q = \pares{q_1^2 + \uv \cdot \uv} + \pares{q_1 \uv - q_1 \uv - \uv \times \uv} = q_1^2 + \uv \cdot \uv \]
+			\end{enumerate}
+
+		\subsection{Скалярное произведение кватернионов}
+
+			Рассмотрим два кватерниона:
+			\[ \pq{1} = q_1 + \uv_1 \cdot \uI, ~ \pq{2} = q_2 + \uv_2 \cdot \uI, \quad \uv_i = {\prescript{i}{}{\underline{q}}}_I. \]
+			Скалярным произведение двух кватернионов называется следующее выражение:
+			\[ \pares{\pq{1}, \pq{2}} = q_1 \cdot q_2 + \uv_1 \cdot \uv_2. \]
+			Свойства:
+			\begin{enumerate}
+				\item Коммутативность: $\pares{\pq{1}, \pq{2}} = \pares{\pq{2}, \pq{1}}$;
+				\item Дистрибутивно относительно сложения: $\pares{\pq{1}, \pq{2} + \pq{3}} = \pares{\pq{1}, \pq{2}} + \pares{\pq{1}, \pq{3}}$;
+				\item Дистрибутивно относительно умножения кватерниона на число: $\lambda \cdot \pares{\pq{1}, \pq{2}} = \pares{\lambda \cdot \pq{1}, \pq{2}} = \pares{\pq{1}, \lambda \cdot \pq{2}}$.
+			\end{enumerate}
+
+		\subsection{Норма и модуль кватернионов}
+			Рассмотрим кватернион:
+			\[ q = q_1 + q_i \cdot i + q_j \cdot j + q_k \cdot k = q_1 + \uv \cdot \uI, ~ \uv = \underline{q}_I \]
+
+			Нормой кватерниона называется следующее число:
+			\[ \norm{q} = \pares{q, q} = q_1^2 + q_i^2 + q_j^2 + q_k^2 = q_1^2 + \uv \cdot \uv. \]
+
+			\textbf{Th:} Норма произведения кватернионов равняется произведению норм:
+				\[ \norm{\pq{1} \cdot \pq{2}} = \norm{\pq{1}} \cdot \norm{\pq{2}}. \]
+			
+			\textbf{Pf:} 
+				Рассмотрим два кватерниона:
+				\[ \pq{1} = q_1 + \uv_1 \cdot \uI, ~ \pq{2} = q_2 + \uv_2 \cdot \uI, \quad \uv_i = {\prescript{i}{}{\underline{q}}}_I. \]
+				Их произведением будет следующий кватернион:
+				\[ \pq{1} \cdot \pq{2} = \pares{q_1 q_2 - \uv_1 \cdot \uv_2} + \pares{q_1 \uv_2 + q_2 \uv_1 + \uv_1 \times \uv_2} \cdot \uI. \]
+				Тогда:
+				\[ \begin{split}
+					\norm{\pq{1} \cdot \pq{2}} &= \pares{\pq{1} \cdot \pq{2}, ~ \pq{1} \cdot \pq{2}} = \pares{q_1 q_2 - \uv_1 \cdot \uv_2}^2 + \pares{q_1 \uv_2 + q_2 \uv_1 + \uv_1 \times \uv_2}^2 = \\
+					&= q_1^2 q_2^2 - 2q_1 q_2 \cdot \pares{\uv_1 \cdot \uv_2} + \pares{\uv_1 \cdot \uv_2}^2 + \\ 
+					&+ q_1^2 \cdot \pares{\uv_2 \cdot \uv_2} + q_2^2 \cdot \pares{\uv_1 \cdot \uv_1} + \pares{\uv_1 \times \uv_2,  ~ \uv_1 \times \uv_2} + \\
+					&+ 2 q_1 q_2 \cdot \pares{\uv_1 \cdot \uv_2} + 2 \pares{q_2 \uv_1 + q_1 \uv_2} \cdot \pares{\uv_1 \times \uv_2} = \\
+					&= q_1^2 q_2^2 + q_1^2 \cdot \pares{\uv_2 \cdot \uv_2} + q_2^2 \cdot \pares{\uv_1 \cdot \uv_1} + \\
+					&+ \pares{\uv_1 \cdot \uv_2}^2 + 2 \pares{q_2 \uv_1 + q_1 \uv_2} \cdot \pares{\uv_1 \times \uv_2} + \abs{\uv_1 \times \uv_2}^2 = *
+				\end{split} \]
+				Так как $\uv_i \cdot \pares{\uv_i \times \uv_j} = 0$, $\abs{\uv_1 \times \uv_2}^2 = \abs{\uv_1}^2 \cdot \abs{\uv_2}^2 - \pares{\uv_1 \cdot \uv_2}^2$, и $\abs{\uv_i}^2 = \pares{\uv_i, \uv_i}$, подставим в выражение
+				\[ \begin{split}
+					&= q_1^2 q_2^2 + q_1^2 \cdot \pares{\uv_2 \cdot \uv_2} + q_2^2 \cdot \pares{\uv_1 \cdot \uv_1} + \pares{\uv_1 \cdot \uv_2}^2 + \abs{\uv_1}^2 \cdot \abs{\uv_2}^2 - \pares{\uv_1 \cdot \uv_2}^2 = \\
+					&= q_1^2 q_2^2 + q_1^2 \cdot \pares{\uv_2 \cdot \uv_2} + q_2^2 \cdot \pares{\uv_1 \cdot \uv_1} + \pares{\uv_1, \uv_1} \cdot \pares{\uv_2, \uv_2} = \\
+					&= \pares{q_1 + \uv_1 \cdot \uv_1} \cdot \pares{q_2 + \uv_2 \cdot \uv_2} = \norm{\pq{1}} \cdot \norm{\pq{2}}. \quad\quad \rule{8pt}{8pt}
+				\end{split} \] 
+
+			Модулем кватерниона называется следующее число (корень из скалярного квадрата):
+			\[ \abs{q} = \sqrt{\pares{q, q}}. \]
+
+		\subsection{Обратный кватернион}
+			Рассмотрим кватернион:
+			\[ q = q_1 + \uv \cdot \uI, ~ \uv = \underline{q}_I \]
+
+			Кватернион
+			\[ \tilde{q} = \tilde{q}_1 + \tilde{\uv} \cdot \uI, ~ \tilde{\uv} = \underline{\tilde{q}}_I \]
+			называется обратным кватернионом к $q$, если
+			\[ q \cdot \tilde{q} = 1. \]
+
+			Для нахождения общей формулы для обратного кватерниона, рассмотрим сопряженный к $q$:
+			\[ q^{*} = q_1 - \uv \cdot \uI. \]
+
+\end{document}
