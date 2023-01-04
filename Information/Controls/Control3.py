@@ -50,6 +50,17 @@ def tasks_updater(text):
 
 	text = text.replace("#SURFACE1#", SurfaceEquations.generate_task_string())
 
+	axis = ["X", "Y", "Z"]
+	random.shuffle(axis)
+
+	p1 = axis[0]+axis[1]
+	p2 = axis[1]+axis[2]
+	p3 = axis[2]+axis[0]
+
+	text = text.replace("#OP1#", p1)
+	text = text.replace("#OP2#", p2)
+	text = text.replace("#OP3#", p3)
+
 	text = TextReplacer.text_replacer(text)
 
 	return text
