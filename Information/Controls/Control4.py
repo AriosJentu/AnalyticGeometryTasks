@@ -1,4 +1,5 @@
 import random
+import sympy as sp
 
 from ..Default import Control
 import Modules.Imports as Imports
@@ -17,6 +18,30 @@ SurfaceEquations = Imports.Tasks.TasksGetter(prefix+"Special/Surfaces.tex")
 SurfaceEquations.add_prefix_path(Imports.MODULE_PATH)
 SurfaceEquations.read_information()
 
+def generate_random_simple_vector():
+	angles = [
+		sp.pi/2,
+		sp.pi/3, 2*sp.pi/3, 4*sp.pi/3, 5*sp.pi/3,
+		sp.pi/4, 3*sp.pi/4, 5*sp.pi/4, 7*sp.pi/4,
+	]
+
+	phi, theta = random.sample(angles, 2)
+
+	#Spherical coordinates
+	if theta != sp.pi/2:
+		s = [sp.cos(phi)*sp.cos(theta), sp.sin(phi)*sp.cos(theta), sp.sin(theta)]
+		random.shuffle(s)
+		x, y, z = s
+	else:
+		s = [sp.cos(phi)*sp.sin(theta), sp.sin(phi)*sp.sin(theta), sp.cos(theta)]
+		random.shuffle(s)
+		x, y, z = s
+
+	denoms = [sp.fraction(i)[1] for i in [x, y, z]]
+	com_mul = sp.lcm(denoms)*random.choice([1, sp.sqrt(2), sp.sqrt(3), sp.sqrt(6)])*random.choice([-1, 1])
+
+	return "\\left\\lbrace"+sp.latex(x*com_mul)+", "+sp.latex(y*com_mul)+", "+sp.latex(z*com_mul)+"\\right\\rbrace"
+
 def tasks_updater(text):
 	random.seed()
 
@@ -26,7 +51,8 @@ def tasks_updater(text):
 		Lines.generate_point_name()
 	))
 
-	text = text.replace("#VECTOR1#", Lines.Vector.generate_random_vector(3).to_str())
+	# text = text.replace("#VECTOR1#", Lines.Vector.generate_random_vector(3).to_str())
+	text = text.replace("#VECTOR1#", generate_random_simple_vector())
 	text = text.replace("#DANGLE1#", random.choice(Lines.ANGLES_DOUBLE))
 
 	text = text.replace("#SURFACE1#", SurfaceEquations.generate_task_string())

@@ -212,7 +212,7 @@ if __name__ == "__main__":
 		# 3) Define angle of rotation around this axis:
 
 		# 4) Define rotation quaternion around axis for specific angle (it's half of the angle, COS is real part, SIN is imaginary)
-		q = Quaternion(math.cos(angle/2), axis*math.sin(angle/2))
+		q = Quaternion(math.cos(angle/2), axis*math.sin(angle/2)/axis.len())
 
 		# 5) Find inverse of this rotation quaternion:
 		qi = q.inverse()
@@ -258,7 +258,8 @@ if __name__ == "__main__":
 	p2 = q*p*qinv
 	# print(p2)
 	# print((p2.imag).as_real())
-	print(rotate(Vector(-9, -4, -9), Vector(-5, -5, -4), -2*math.pi/3).as_real())
+	print(rotate(Vector(7, -9, 3), Vector(-8, 1, 0), 3*math.pi/2).as_real())
+	print(rotate(Vector(7, -9, 3), Vector(-8/math.sqrt(65), 1/math.sqrt(65), 0), 3*math.pi/2).as_real())
 
 
 	# q = Quaternion.from_values(3, 0, 2, -3)
