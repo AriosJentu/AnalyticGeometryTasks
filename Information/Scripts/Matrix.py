@@ -53,6 +53,9 @@ class Vector:
 		return self.size
 
 	def add(self, vector: "Vector") -> "Vector":
+		if vector == 0:
+			vector = Vector(self.size)
+
 		if not self.__check_size__(vector):
 			return
 
@@ -81,15 +84,14 @@ class Vector:
 		if not self.__check_size__(vector) and self.size != 3:
 			return
 
-		deft = Vector.from_list([0, 0, 0])
-		mtx = Matrix.from_list_of_vectors([deft, self, vector])
+		b1 = Vector.from_list([1, 0, 0])
+		b2 = Vector.from_list([0, 1, 0])
+		b3 = Vector.from_list([0, 0, 1])
+		
+		basis = Vector.from_list([b1, b2, b3])
+		mtx = Matrix.from_list_of_vectors([basis, self, vector])
 
-		parts = []
-		for i in range(3):
-			det = mtx.get_matrix_minor(0, i).determinant()
-			parts.append(det * (-1)**i)
-
-		return Vector.from_list(parts)
+		return mtx.determinant()
 
 
 	def to_list(self):
@@ -877,9 +879,25 @@ if __name__ == "__main__":
 	# print(mtx8)
 	# print(mtx8*mtx8.transpose())
 
-	s = Vector.from_list(["x", "y", "z"])
-	print(s.to_latex())
+	# s = Vector.from_list(["x", "y", "z"])
+	# print(s.to_latex())
 
-	a = Vector.from_list([3, 4, -1])
-	b = Vector.from_list([5, 1, -2])
-	print(a.cross_product(b).to_latex_row())
+	# a = Vector.from_list([3, 4, -1])
+	# b = Vector.from_list([5, 1, -2])
+	# print(a.cross_product(b).to_latex_row())
+
+	b1 = Vector.from_list([1, 0, 0])
+	b2 = Vector.from_list([0, 1, 0])
+	b3 = Vector.from_list([0, 0, 1])
+
+	basis = Vector.from_list([b1, b2, b3])
+
+	v1 = Vector.from_list([1, 2, 3])
+	v2 = Vector.from_list([3, 2, -1])
+
+	mtx = Matrix.from_list_of_vectors([basis, v1, v2])
+	print(mtx)
+	print(mtx.determinant())
+
+	print(v1.cross_product(v2))
+	print(v2.cross_product(v1))
