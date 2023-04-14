@@ -1,0 +1,188 @@
+Первая лабораторная работа заключается в реализации базовых классов линейной алгебры и аналитической геометрии.
+
+\subsection{Определения}
+
+	Определим понятие линейного (векторного) пространства и базиса. 
+
+	\textit{Линейное (векторное) пространство} -- множество векторов, в котором определены операции сложения и умножения на число.
+
+	\textit{Базис} -- полная система линейно независимых векторов линейного пространства. В ней ни один из векторов нельзя выразить линейно через другие, и через них можно описать любой вектор линейного пространства.
+	
+	\textit{Система координат} -- система, состоящая из произвольной начальной точки и базиса. 
+
+	В линейном пространстве задается скалярное произведение. Свойства скалярного произведения:
+	\begin{enumerate}
+		\item \( \pares{\ua, \ub} = \pares{\ub, \ua} \) -- симметричность;
+		\item \( \pares{k \ua, \ub} = k\pares{\ua, \ub}, ~ k - \mathrm{const} \) -- линейность;
+		\item \( \pares{\ua + \ub, \uc} = \pares{\ua, \ub} + \pares{\ub, \uc} \) -- дистрибутивность.
+	\end{enumerate} 
+
+	Выразим скалярное произведение через координаты перемножаемых векторов. Пусть \( \uf_1, \uf_2, \dots \uf_n \) -- базис пространства векторов, и \( \ua = \alpha_1 \uf_1 + \alpha_2 \uf_2 + \dots + \alpha_n \uf_n \), \( \ub = \beta_1 \uf_1 + \beta_2 \uf_2 + \dots + \beta_n \uf_n \) -- разложение векторов $\ua, \ub$ по этому базису. Тогда по свойствам скалярного произведения получаем:
+	\[ \pares{\ua, \ub} = \sum_{i, j = 1}^{n} \alpha_i \beta_j \pares{\uf_i, \uf_j} \]
+	Обозначим матрицу Грама
+	\[ 
+		\Gamma \pares{\uf_1, \uf_2, \dots, \uf_n} = 
+		\begin{pmatrix} 
+			\pares{\uf_1, \uf_1}_*, & \cdots & \pares{\uf_1, \uf_n}_* \\ 
+			\vdots & \ddots & \vdots \\ 
+			\pares{\uf_n, \uf_1}_* & \cdots & \pares{\uf_n, \uf_n}_*
+		\end{pmatrix}
+	\]
+	и координаты вектора $\uv$ в базисе $f$:
+	\( \bracks{\uv}_f = \begin{pmatrix} v_1 \\ \vdots \\ v_n \end{pmatrix}. \)
+	
+	Здесь \( \pares{\ua, \ub}_* = \sum\limits_{k=1}^n a_k b_k \) -- диагональная билинейная форма скалярного произведения (в ортонормированном базисе).
+
+	Тогда скалярное произведение в неортонормированном базисе $f$ можно представить с помощью матричного умножения:
+	\[ \pares{\ua, \ub}_{f} = \bracks{\ua}^{T} \cdot \Gamma\pares{\uf_1, \dots, \uf_n} \cdot \bracks{\ub}_f. \]
+
+	Билинейной формой будем называть такую функцию двух аргументов, которая будет линейной относительно них, и удовлетворяет следующим свойствам:
+	\begin{enumerate}
+		\item \( F(x + z, y) = F(x, y) + F(z, y) \);
+		\item \( F(x, y + z) = F(x, y) + F(x, z) \);
+		\item \( F(kx, y) = F(x, ky) = k F(x, y), ~ k - \mathrm{const} \).
+	\end{enumerate}
+
+	Классическим случаем билинейной формы считаются функции двух $n$-мерных векторов линейного пространства следующего вида:
+	\[ F(\ux, \uy) = \sum_{i, j=1}^{n} a_{ij} x_i y_j.  \]
+
+	Ортонормированным векторным произведением будем называть следующую конструкцию:
+	\[ 
+		\bracks{\underline{u}, \underline{v}} = \det\begin{vmatrix} \underline{i} & \underline{j} & \underline{k} \\ u_x & u_y & u_z \\ v_x & v_y & v_z \end{vmatrix}; 
+		\quad \underline{i} = \begin{pmatrix} 1 \\ 0 \\ 0 \end{pmatrix}, 
+		~ \underline{j} = \begin{pmatrix} 0 \\ 1 \\ 0 \end{pmatrix}, 
+		~ \underline{k} = \begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix}. 
+	\]
+
+	Векторным произведением в трехмерном пространстве с косоугольным базисом \( \bracs{\underline{b}_1, \underline{b}_2, \underline{b}_3} \) будем называть следующее выражение:
+	\[ 
+		\bracks{\underline{u}, \underline{v}}_{*} = \det\begin{vmatrix} \bracks{\underline{b}_2, \underline{b}_3} & \bracks{\underline{b}_3, \underline{b}_1} & \bracks{\underline{b}_1, \underline{b}_2} \\ u_x & u_y & u_z \\ v_x & v_y & v_z \end{vmatrix}.
+	\]
+
+\subsection{Этапы реализации}
+
+	Зафиксируем представленную алгебру и геометрию в поэтапной реализации движка:
+	\begin{enumerate}
+		\item Реализация класса матрицы и функции билинейной формы. Их будем считать самыми первостепенными классами нашего движка.
+		\item На основе матрицы реализуем понятие радиус-вектора. Для них реализуем скалярное и векторное (только для трехмерного случая) произведения в ортонормированном пространстве.
+		\item Для класса матрицы с помощью билинейной формы реализуем матрицу Грама, принимающую на себя $n$ векторов размерности $n$.
+		\item Введем понятие векторного пространства с базисом, внутри которого реализуем скалярное и векторное произведения на основе рассматриваемого базиса.
+		\item Реализуем понятие точки в векторном пространстве на основе понятия вектора.
+		\item На основе точек и векторного пространства реализуем систему координат.
+	\end{enumerate}
+
+\subsection{Класс Matrix}
+	\noindent Класс матрицы, содержащий базовые алгебраические операции над матрицами.
+
+	\noindent Инициализация:
+	\begin{enumerate}
+		\item \inlinecode{Matrix(n: int)} -- нулевая матрица заданной размерности \( n \times n \);
+		\item \inlinecode{Matrix(n: int, m: int)} -- нулевая матрица заданной размерности \( n \times m \);
+		\item \inlinecode{Matrix(elements: list[list[int | float]])} -- матрица с заданными элементами.
+	\end{enumerate}
+
+	\noindent Реализуемые поля:
+	\begin{enumerate}
+		\item \inlinecode{n(int), m(int)} -- размерность матрицы;
+		\item \inlinecode{elements(list[list[matrix(float)]])} -- массив матрицы.
+	\end{enumerate}
+
+	\noindent Реализуемые методы:
+	\begin{enumerate}
+		\item \inlinecode{addition(m: Matrix) -> Matrix}, \inlinecode{multiplication(m: Matrix) -> Matrix}, \newline \inlinecode{multiplication(c: int | float) -> Matrix} -- базовые матричные операции;
+		\item \inlinecode{get_minor(lines: list[int], rows: list[int]) -> Matrix} -- создает матрицу, основанную на текущей, из которой исключаются заданные строки и столбцы;
+		\item \inlinecode{determinant() -> float} -- определитель матрицы (работает только в случае \(n \times n\));
+		\item \inlinecode{inverse() -> Matrix} -- обратная матрица (работает только в случае \(n \times n\) и \( \det{A} \neq 0 \));
+		\item \inlinecode{transpose() -> Matrix} -- транспонированная матрица;
+		\item \inlinecode{norm() -> float} -- норма матрицы;
+		\item \inlinecode{Matrix.identity(n: int) -> Matrix} -- статический метод, создающий $n$-мерную единичную матрицу;
+		\item \inlinecode{Matrix.gram(v1, ..., vn : Vector) -> Matrix} -- статический метод, создающий матрицу Грама на основе заданных $n$-векторов размерности $n$.
+	\end{enumerate}
+
+	\noindent Перегружаемые операторы:
+	\begin{enumerate}
+		\item \inlinecode{Matrix + | - Matrix} (операции сложения и вычитания матриц);
+		\item \inlinecode{Matrix * [Matrix | int | float]} (левое и правое умножение, умножение слева перегрузить на основе умножения справа);
+		\item \inlinecode{Matrix / [Matrix | int | float]} (на основе метода \inlinecode{inverse});
+		\item \inlinecode{\~ Matrix} (обращение матрицы через \inlinecode{inverse});
+		\item \inlinecode{Matrix[i, j : int] | Matrix[i: int][j: int]} (операция обращения (и присваивания) к элементу матрицы).
+	\end{enumerate}
+
+\subsection{Функция BilinearForm(\textit{Matrix, Vector, Vector})}
+	\noindent Функция принимает на себя матрицу $n \times n$, и два вектора размерности $n$. Возвращает результат рассчета билинейной формы относительно двух векторов.
+
+\subsection{Класс Vector[\textit{Matrix}]}
+	\noindent Класс вектора наследуется от класса матрицы, является частным случаем матрицы $n \times 1$.
+
+	\noindent Инициализация:
+	\begin{enumerate}
+		\item \inlinecode{Vector(n: int)} -- нулевой вектор заданной размерности \( n \);
+		\item \inlinecode{Vector(elements: list[list[int | float]])} -- вектор-столбец с заданными значениями;
+		\item \inlinecode{Vector(elements: list[int | float])} -- вектор-строка с заданными значениями.
+	\end{enumerate}
+
+	\noindent Реализуемые методы:
+	\begin{enumerate}
+		\item \inlinecode{scalar_product(v1, v2 : Vector) -> float} -- ортонормированное скалярное произведение двух $n$-мерных векторов;
+		\item \inlinecode{vector_product(v1, v2 : Vector) -> Vector} -- ортонормированное векторное произведение двух трехмерных векторов (через определитель матрицы);
+		\item \inlinecode{length() -> float} -- длина вектора;
+		\item \inlinecode{normalize() -> Vector} -- нормализация вектора;
+		\item \inlinecode{dim() -> int} -- размерность вектора.
+	\end{enumerate}
+
+	\noindent Перегружаемые операторы:
+	\begin{enumerate}
+		\item \inlinecode{Vector \% Vector} (ортонормированное скалярное произведение);
+		\item \inlinecode{Vector ^ | ** Vector} (ортонормированное векторное произведение (только для трехмерного случая));
+		\item \inlinecode{Vector[i: int]} (операция обращения к элементу вектора, вне зависимости от алгебраической формы -- строка или столбец).
+	\end{enumerate}
+
+\subsection{Класс VectorSpace}
+	\noindent Класс векторного пространства, содержащего набор базисных векторов.
+
+	\noindent Инициализация:
+	\begin{enumerate}
+		\item \inlinecode{VectorSpace(basis: list[Vector])} -- векторное пространство с заданными базисными векторами.
+	\end{enumerate}
+
+	\noindent Реализуемые поля:
+	\begin{enumerate}
+		\item \inlinecode{basis(list[Vector])} -- список базисных векторов.
+	\end{enumerate}
+
+	\noindent Реализуемые методы:
+	\begin{enumerate}
+		\item \inlinecode{scalar_product(v1, v2 : Vector) -> float} -- скалярное произведение двух $n$-мерных векторов в базисе данного пространства;
+		\item \inlinecode{vector_product(v1, v2 : Vector) -> Vector} -- векторное произведение двух 3-мерных векторов в базисе данного пространства;
+		\item \inlinecode{as_vector(pt: Point) -> Vector} -- вектор, полученный разложением координат точки по базисным векторам.
+	\end{enumerate}
+
+\subsection{Класс Point[\textit{Vector}]}
+	\noindent Класс точки, являющейся частным случаем вектора. 
+
+	\noindent Инициализация:
+	\begin{enumerate}
+		\item \inlinecode{Point} -- наследуемая инициализация согласно инициализации вектора;
+		\item \inlinecode{Point(vec: Vector)} -- точка на основе вектора.
+	\end{enumerate}
+
+	\noindent Перегружаемые операторы:
+	\begin{enumerate}
+		\item \inlinecode{Point + | -- Vector} (перенос точки).
+	\end{enumerate}
+
+	Наследованные операторы умножения и деления необходимо упразднить.
+
+\subsection{Класс CoordinateSystem}
+	\noindent Класс системы координат, содержащей начальную точку и базисные вектора.
+
+	\noindent Инициализация:
+	\begin{enumerate}
+		\item \inlinecode{CoordinateSystem(initial: Point, basis: VectorSpace)} -- система координат с начальной точкой и базисом.
+	\end{enumerate}
+
+	\noindent Реализуемые поля:
+	\begin{enumerate}
+		\item \inlinecode{initial_point(Point)} -- начальная точка системы координат;
+		\item \inlinecode{space(VectorSpace)} -- базисные вектора.
+	\end{enumerate}

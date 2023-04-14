@@ -1,0 +1,202 @@
+Третья лабораторная работа посвящена реализация основной логики и иерархии проекта. Также в дополнение будут реализованы дополнительные классы, связанные с математическими операциями. 
+
+\subsection{Пространство имен движка}
+
+	Первая часть данной работы заключается в реализации специального пространства имен для движка (\inlinecode{namespace Engine}), внутри которого будут реализованы необходимые классы для работы с самим движком. 
+
+	Базовыми классами мы будем считать следующие:
+	\begin{enumerate} 
+		\item \inlinecode{Ray} -- класс лучей. Данный класс будет реализован на основе некоторой начальной точки (\textit{источника}), и направлен вдоль заданного вектора (\textit{направления}) в заданной системе координат;
+		\item \inlinecode{Identifier} -- абстрактный класс идентификаторов. Может задаваться разработчиком индивидуально;
+		\item \inlinecode{Entity} -- общий класс, описывающий различные сущности внутри движка. Его параметрами будут система координат и идентификатор;
+		\item \inlinecode{EntitiesList} -- класс, представляющий собой список активных сущностей. Имеет возможность добавлять и удалять сущности по идентификатору, а так же применять какие-либо операции на все сущности последовательно;
+		\item \inlinecode{Game} -- класс игры, содержащий в себе базовую информацию о пространстве и списке сущностей.
+	\end{enumerate} 
+
+\subsection{Класс Ray}
+	\noindent Класс луча игрового движка.
+
+	\noindent Инициализация:
+	\begin{enumerate}
+		\item \inlinecode{Ray(cs: CoordinateSystem, initialpt: Point, direction: Vector)} -- луч, построенный в заданной системе координат из некоторой начальной точки по направлению вектора.
+	\end{enumerate}
+
+	\noindent Реализуемые поля:
+	\begin{enumerate}
+		\item \inlinecode{cs(CoordinateSystem)} -- система координат;
+		\item \inlinecode{initialpt(Point)} -- начальная точка для луча;
+		\item \inlinecode{direction(Vector)} -- направление луча.
+	\end{enumerate}
+
+\subsection{Класс Identifier}
+	\noindent Класс идентификаторов. Содержит некоторый глобальный идентификатор, и позволяет создавать индивидуальные значения. Идентификаторы можно генерировать различными способами, отличными от классической схемы инкрементирования. Например, 16-ричный код, каждый раз такой, чтобы он не содержался в множестве существующих идентификаторов. Другой вариант -- генерация по времени или тику инициализации, так как они гарантировано не имеют возможности вернуться назад, генерируя каждый новый вызов разные комбинации.
+
+	\noindent Инициализация:
+	\begin{enumerate}
+		\item \inlinecode{Identifier()} -- создание нового идентификатора.
+	\end{enumerate}
+
+	\noindent Реализуемые поля:
+	\begin{enumerate}
+		\item \inlinecode{Identifier.identifiers(set)} -- поле класса, хранящее в себе множество всех существующих идентификаторов. Заполняется при создании нового;
+		\item \inlinecode{value(any: int | float | str)} -- значение текущего идентификатора.
+	\end{enumerate}
+
+	\noindent Реализуемые методы:
+	\begin{enumerate}
+		\item \inlinecode{get_value() -> any: int | float | str} -- метод, возвращающий значение текущего идентификатора;
+		\item \inlinecode{Identifier.__generate__() -> any: int | float | str} -- приватный статический метод, создающий новое значение идентификатора некоторыми методами, который затем реализуется при инициализации.
+	\end{enumerate}
+
+\subsection{Класс Entity}
+	\noindent Класс сущности игрового движка.
+
+	\noindent Инициализация:
+	\begin{enumerate}
+		\item \inlinecode{Entity(cs: CoordinateSystem)} -- сущность в заданной системе координат.
+	\end{enumerate}
+
+	\noindent Реализуемые поля:
+	\begin{enumerate}
+		\item \inlinecode{cs(CoordinateSystem)} -- система координат;
+		\item \inlinecode{identifier(any: int | str)} -- идентификатор сущности;
+		\item \inlinecode{properties(dict)} -- таблица свойств сущности.
+	\end{enumerate}
+
+	\noindent Реализуемые методы:
+	\begin{enumerate}
+		\item \inlinecode{set_property(prop: str, value: any) -> None} -- метод, устанавливающий свойства для сущности;
+		\item \inlinecode{get_property(prop: str) -> any} -- метод, устанавливающий свойства для сущности;
+		\item \inlinecode{remove_property(prop: str) -> None} -- метод, удаляющий свойства для сущности.
+	\end{enumerate}
+
+	\noindent Перегружаемые операторы:
+	\begin{enumerate}
+		\item \inlinecode{Entity[prop: str]} (оператор обращения (и присваивания) к свойству сущности как к таблице по индексу);
+		\item \inlinecode{Entity.prop} (оператор обращения (и присваивания) к свойству сущности как к свойству объекта класса).
+	\end{enumerate}
+
+\subsection{Класс EntitiesList}
+	\noindent Класс списка сущностей игрового движка.
+
+	\noindent Инициализация:
+	\begin{enumerate}
+		\item \inlinecode{EntitiesList(entities: list)} -- список сущностей.
+	\end{enumerate}
+
+	\noindent Реализуемые поля:
+	\begin{enumerate}
+		\item \inlinecode{entities(list)} -- список сущностей.
+	\end{enumerate}
+
+	\noindent Реализуемые методы:
+	\begin{enumerate}
+		\item \inlinecode{append(entity: Entity) -> None} -- метод, добавляющий сущность в список;
+		\item \inlinecode{remove(entity: Entity) -> None} -- метод, удаляющий сущность из списка по идентификатору;
+		\item \inlinecode{get(id: Identifier) -> Entity} -- метод, возвращающий сущность по заданному идентификатору, если она существует в списке;
+		\item \inlinecode{exec(func: Callable[Entity]) -> None} -- метод, применяющий функцию одного аргумента (сущности) на все сущности данного списка.
+	\end{enumerate}
+
+	\noindent Перегружаемые операторы:
+	\begin{enumerate}
+		\item \inlinecode{EntitiesList[id: Identifier]} (оператор (только) обращения к сущности по идентификатору).
+	\end{enumerate}
+
+\subsection{Класс Game}
+	\noindent Класс, отвечающий за базовый объект создаваемой игры. Из заданного класса можно получить индивидуальных наследников базовых классов \inlinecode{Entity}, на основе которых реализовывать дальнейшую работу.
+
+	\noindent Инициализация:
+	\begin{enumerate}
+		\item \inlinecode{Game(cs: CoordinateSystem, entities: EntitiesList)} -- класс игры, содержащий в себе базовую информацию в виде системы координат и списка сущностей.
+	\end{enumerate}
+
+	\noindent Реализуемые поля:
+	\begin{enumerate}
+		\item \inlinecode{cs(CoordinateSystem)} -- реализуемая система координат в данном экземпляре игры;
+		\item \inlinecode{entities(EntitiesList)} -- список сущностей в данном экземпляре игры.
+	\end{enumerate}
+
+	\noindent Реализуемые методы:
+	\begin{enumerate}
+		\item \inlinecode{run() -> None} -- метод, исполняющий скрипт запуска игры;
+		\item \inlinecode{update() -> None} -- метод, исполняющий скрипт <<обновления>> игрового процесса (обновление информации);
+		\item \inlinecode{exit() -> None} -- метод, исполняющий скрипт <<выхода>> из игрового процесса;
+		\item \inlinecode{get_entity_class() -> class [Game.Entity]} -- метод, возвращающий класс сущностей с уже заданной системой координат;
+		\item \inlinecode{get_ray_class() -> class [Game.Ray]} -- метод, возвращающий класс луча с уже заданной системой координат.
+	\end{enumerate}
+
+Для класса \inlinecode{Game} реализовать частные случаи классов \inlinecode{Game.Entity}: \inlinecode{Object} и \inlinecode{Camera} с некоторыми заданными свойствами.
+
+\begin{figure}[H]
+	\begin{lstlisting}[caption=Пример кода реализации создания класса со значением по умолчанию]
+class Object:
+	def __init__(self, var):
+		self.var = var
+		self.param = 0
+
+	def other_method(self):
+		return f"'{self.param}' and '{self.var}'"
+
+class Game:
+	def __init__(self, var):
+		self.var = var
+
+	def get_new_object_class(self):
+		class EngineObject(Object):
+			def __init__(pself):
+				super().__init__(self.var)
+
+		return EngineObject
+	\end{lstlisting}
+\end{figure}
+
+\subsection{Класс Game.Object[\textit{Game.Entity}]}
+	\noindent Некоторый частный случай класса \inlinecode{Entity}. В качестве задаваемых свойств хранит в себе \inlinecode{position} -- положение в пространстве, \inlinecode{direction} -- направление <<обзора>> объекта, на основе которого в дальнейшем объект можно будет вращать. Система координат объекта подгружается автоматически из класса \inlinecode{Game.Entity}, которому, в свою очередь, система координат известна из класса \inlinecode{Game}. По умолчанию считаем, что направление обзора считается относительно фиксированного вектора базиса системы координат. Вращение вектора направления вращает объект в заданной системе координат путем поворота базиса для рассматриваемого объекта.
+
+	\noindent Инициализация:
+	\begin{enumerate}
+		\item \inlinecode{Game.Object(position: Point, direction: Vector)} -- класс объекта, заданного в некотором положении в заданной системе координат с некоторым направлением <<обзора>>. При инициализации вызывается метод \inlinecode{set_property} для заданных аргументов. Вектор направления необходимо нормировать в заданном векторном пространстве.
+	\end{enumerate}
+
+	\noindent Реализуемые методы:
+	\begin{enumerate}
+		\item \inlinecode{move(dir: Vector) -> None} -- переместить объект по направлению вектора;
+		\item \inlinecode{planar_rotate(inds: (int, int), angle: float) -> None} -- повернуть объект в плоскости, заданной двумя осями на заданный угол;
+		\item \inlinecode{rotate_3d(angles: (float, float, float)) -> None} -- повернуть трехмерный объект на заданные углы;
+		\item \inlinecode{set_position(position: Point) -> None} -- установить положение объекта в пространстве;
+		\item \inlinecode{set_direction(direction: Vector) -> None} -- установить направление <<обзора>> объекта в пространстве (вектор необходимо нормировать).
+	\end{enumerate}
+
+	Получить значение положения или направления объекта в пространстве в таком случае можно будет с помощью обращения к свойствам \inlinecode{position} и \inlinecode{direction}, используя уже готовый синтаксис.
+
+\subsection{Класс Game.Camera[\textit{Game.Object}]}
+	\noindent Частный случай класса \inlinecode{Object}. В качестве задаваемых свойств хранит в себе в дополнение \inlinecode{fov} и \inlinecode{vfov} -- горизонтальный и вертикальный угол обзора (в радианах, в случае задачи в градусах -- приводить к радианной мере), \inlinecode{draw_distance} -- дальность прорисовки камеры. Так же можно создать отдельный конструктор, когда камера будет смотреть в конкретную точку. Вертикальный угол обзора можно рассчитывать автоматически, а можно задавать вручную.
+
+	\noindent Инициализация:
+	\begin{enumerate}
+		\item \inlinecode{Game.Camera(fov: float, draw_distance: float)} -- класс камеры, заданной в некотором положении в заданной системе координат с некоторым направлением <<обзора>>. Задается горизонтальный угол обзора и дистанция прорисовки. Данный вариант не содержит вертикальный угол обзора. При инициализации вызывается метод \inlinecode{set_property} для заданных аргументов;
+		\item \inlinecode{Game.Camera(fov: float, vfov: float, draw_distance: float)} -- аналогично первому случаю, но при этом присутствует вертиальный угол обзора;
+		\item \inlinecode{Game.Camera(fov: float, look_at: Point, draw_distance: float)} -- аналогично первому случаю, но при этом, вместо направления обзора реализуется фиксированная точка обзора. При перемещении камеры, направление <<обзора>> продолжает смотреть в заданную точку, тем самым камера при перемещении будет производить вращение;
+		\item \inlinecode{Game.Camera(fov: float, vfov: float, look_at: Point, draw_distance: float)} -- аналогично третьему случаю, но при этом присутствует вертиальный угол обзора.
+	\end{enumerate}
+
+\subsection{Дополнительно}
+
+	Также необходимо будет дополнить работу следующими деталями:
+
+	\begin{enumerate}
+		\item Для пространства имен \inlinecode{Engine} добавить свойство \inlinecode{PRECISION = n}, задающее точность вычислений. Все математические операции на \inlinecode{float} округлять с точностью до знака, заданного в \inlinecode{PRECISION};
+		\item Для класса \inlinecode{Matrix} реализовать перегрузку обращения к элементу с помощью канонического для используемого языка метода обращения к массиву (к примеру, квадратных скобок), и возвращать в результате вектор-строку;
+		\item Для класса \inlinecode{Vector} реализовать перегрузку обращения к элементу аналогично, при этом не зависимо от формы вектора (вертикальный или горизонтальный).
+		\end{enumerate}
+
+	\subsection{Этапы реализации}
+
+		Зафиксируем представленные классы в поэтапной реализации движка:
+		\begin{enumerate}
+			\item Зададим пространство имен движка, внутри которого реализуем основные классы -- луч, сущность, список сущностей, игра.
+			\item В классе игры введем генерацию индивидуальных для игры классов луча и сущности.
+			\item Внутри пространства имен игры введем наследуемые классы для объекта и камеры с заданными параметрами.
+			\item Дополним классы, связанные с математикой, вычислением математических операции с точностью до заданного знака. Вычисление включает в себя так же операторы сравнения.
+			\item Дополним классы матрицы и вектора перегрузкой оператора обращения к элементам в новом формате.
+		\end{enumerate}

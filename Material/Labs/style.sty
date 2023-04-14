@@ -1,0 +1,93 @@
+\RequirePackage[russian]{babel}
+\RequirePackage{amsmath, amssymb}
+\RequirePackage{listings}
+\RequirePackage[hidelinks]{hyperref}
+\RequirePackage{xcolor}
+\RequirePackage{float}
+\RequirePackage[most]{tcolorbox}
+
+\definecolor{commentcolor}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{classescolor}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{bggray}{rgb}{0.9,0.9,0.9}
+\definecolor{stringcolor}{rgb}{0.2,0.6,0.7}
+\definecolor{numbercolor}{rgb}{0.2,0.8,0.5}
+
+% \lstdefinestyle{pystyle}{
+%     % backgroundcolor=\color{backcolour},   
+%     commentstyle=\color{codegreen},
+%     keywordstyle=\color{magenta},
+%     numberstyle=\tiny\color{codegray},
+%     stringstyle=\color{codepurple},
+%     basicstyle=\footnotesize\ttfamily,
+%     breakatwhitespace=false,         
+%     breaklines=true,                 
+%     captionpos=b,                    
+%     keepspaces=true,                 
+%     numbers=left,                    
+%     numbersep=5pt,                  
+%     showspaces=false,                
+%     showstringspaces=false,
+%     showtabs=false,                  
+%     tabsize=2,
+%     frame=lines
+% }
+
+\lstdefinestyle{pystyle}{
+    % backgroundcolor=\color{backcolour},   
+    % morekeywords={Matrix,Vector,VectorSpace}
+    language=Python,
+    commentstyle=\color{commentcolor},
+    morekeywords={None, self, PRECISION, assert},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{numbercolor},
+    stringstyle=\color{stringcolor},
+    basicstyle=\footnotesize\ttfamily,
+    emph={
+        Matrix, Vector, VectorSpace, BilinearForm, Point, 
+        CoordinateSystem, MatrixOperationsTests, VectorOperationsTests, 
+        Engine, Ray, Identifier, Entity, EntitiesList, Game, Object, Camera,
+        EngineObject, EngineException, MatrixException, VectorException,
+        MatrixWrongSizeException, MatrixIncorrectOperationException, Callable,
+    },
+    emphstyle=\color{classescolor},
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    % numbers=left,                    
+    % numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    frame=lines
+}
+
+
+\lstset{style=pystyle}
+
+\tcbset{on line, 
+    boxsep=3pt, 
+    left=0pt,
+    right=0pt,
+    top=0pt,
+    bottom=0pt,
+    colframe=white,
+    colback=bggray,  
+}
+
+\newcommand{\pares}[1]{\left( #1 \right)}
+\newcommand{\bracs}[1]{\left\lbrace #1 \right\rbrace}
+\newcommand{\bracks}[1]{\left[ #1 \right]}
+
+\newcommand{\ua}{\underline{a}}
+\newcommand{\ub}{\underline{b}}
+\newcommand{\uc}{\underline{c}}
+\newcommand{\uf}{\underline{f}}
+\newcommand{\uv}{\underline{v}}
+\newcommand{\ux}{\underline{x}}
+\newcommand{\uy}{\underline{y}}
+
+\newcommand{\inlinecode}[1]{\tcbox{\lstinline[style=pystyle]{#1}}}
