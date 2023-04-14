@@ -11,6 +11,7 @@ from .Controls import Control3
 from .Controls import Control4
 from .Exam import Exam
 from .Comission import Comission
+from .Comission import ComissionNew
 
 #Append assignments into Assignments Information List
 AssignmentsInformation.append(Homework1.Homework1, "h")
@@ -28,4 +29,5 @@ AssignmentsInformation.append(Exam.Exam, "e")
 AssignmentsInformation.set_description("e", "Exam tasks of analytic geometry course")
 
 AssignmentsInformation.append(Comission.Comission, "k")
+AssignmentsInformation.append(ComissionNew.ComissionNew, "k")
 AssignmentsInformation.set_description("k", "Comission tasks")
