@@ -59,6 +59,9 @@
 		\bracks{\underline{u}, \underline{v}}_{*} = \det\begin{vmatrix} \bracks{\underline{b}_2, \underline{b}_3} & \bracks{\underline{b}_3, \underline{b}_1} & \bracks{\underline{b}_1, \underline{b}_2} \\ u_x & u_y & u_z \\ v_x & v_y & v_z \end{vmatrix}.
 	\]
 
+	Евклидовой нормой матрицы будем называть следующее выражение:
+	\[ \norm{A} = \sqrt{\sum_{i, j = 1}^{n} a_{ij}^2} \]
+
 \subsection{Этапы реализации}
 
 	Зафиксируем представленную алгебру и геометрию в поэтапной реализации движка:
@@ -168,7 +171,7 @@
 
 	\noindent Перегружаемые операторы:
 	\begin{enumerate}
-		\item \inlinecode{Point + | -- Vector} (перенос точки).
+		\item \inlinecode{Point + | - Vector} (перенос точки).
 	\end{enumerate}
 
 	Наследованные операторы умножения и деления необходимо упразднить.
