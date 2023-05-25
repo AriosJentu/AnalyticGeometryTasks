@@ -34,6 +34,10 @@
 %     frame=lines
 % }
 
+\lstdefinelanguage{none}{
+  identifierstyle=
+}
+
 \lstdefinestyle{pystyle}{
     % backgroundcolor=\color{backcolour},   
     % morekeywords={Matrix,Vector,VectorSpace}
@@ -50,6 +54,7 @@
         Engine, Ray, Identifier, Entity, EntitiesList, Game, Object, Camera,
         EngineObject, EngineException, MatrixException, VectorException,
         MatrixWrongSizeException, MatrixIncorrectOperationException, Callable,
+        Math, Exceptions, UnitTests, Event, EventSystem
     },
     emphstyle=\color{classescolor},
     breakatwhitespace=false,         
@@ -62,6 +67,7 @@
     showstringspaces=false,
     showtabs=false,                  
     tabsize=2,
+    escapechar={?},
     frame=lines
 }
 
@@ -78,6 +84,8 @@
     colback=bggray,  
 }
 
+\newcommand{\abs}[1]{\left\vert #1 \right\vert}
+\newcommand{\norm}[1]{\left\Vert #1 \right\Vert}
 \newcommand{\pares}[1]{\left( #1 \right)}
 \newcommand{\bracs}[1]{\left\lbrace #1 \right\rbrace}
 \newcommand{\bracks}[1]{\left[ #1 \right]}
@@ -89,5 +97,9 @@
 \newcommand{\uv}{\underline{v}}
 \newcommand{\ux}{\underline{x}}
 \newcommand{\uy}{\underline{y}}
+\newcommand{\un}{\underline{n}}
+\newcommand{\ud}{\underline{d}}
+\newcommand{\ur}{\underline{r}}
 
 \newcommand{\inlinecode}[1]{\tcbox{\lstinline[style=pystyle]{#1}}}
+\newcommand{\inlinecoden}[1]{\tcbox{\lstinline[style=pystyle, language=none]{#1}}}
